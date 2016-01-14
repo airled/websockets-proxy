@@ -1,8 +1,10 @@
 require 'curb'
 
-request = Curl::Easy.new('http://localhost:6666') do |req|
-  req.headers['Location'] = 'http://muzenza.by' 
-  req.headers['User-Agent'] = 'curl' 
+http = Curl::Easy.new('http://localhost:4567') do |req|
+  req.headers['Location'] = 'http://tut.by' 
+  req.headers['User-Agent'] = 'curl'
 end
 
-request.perform
+http.perform
+
+p http.body

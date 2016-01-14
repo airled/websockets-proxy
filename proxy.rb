@@ -3,17 +3,17 @@ require 'sinatra-websocket'
 
 set :server, 'thin'
 set :sockets, []
-set :port, 6666
 
 get '/' do
   if request.websocket?
     request.websocket do |ws|
       ws.onopen do
-        ws.send("Hello World!")
         settings.sockets << ws
       end
+      ws.onmessage do |msg|
+        p msg
+      end
       ws.onclose do
-        warn("websocket closed")
         settings.sockets.delete(ws)
       end
     end
@@ -23,4 +23,9 @@ get '/' do
   else
     erb :index
   end
+
+end
+
+get '/frame.html' do
+  erb :frame
 end

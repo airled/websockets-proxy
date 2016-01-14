@@ -1,0 +1,23 @@
+<html>
+  <body>      
+    <div id="test"></div>
+
+    <script>
+      var test = document.getElementById('test');
+
+      function listener(event){
+        test.innerHTML = 'Message received';
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", event.data, true);
+        xhr.onload = function () {
+          test.innerText = xhr.responseText;
+          // ws.send(xhr.responseText);
+        };
+        xhr.send();
+      }
+
+      window.addEventListener("message", listener, false);
+    </script>
+
+  </body>
+</html>

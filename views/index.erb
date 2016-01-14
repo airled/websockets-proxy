@@ -1,22 +1,28 @@
 <html>
-
   <body>
-     <div id="msgs"></div>
-  </body>
-
-  <script type="text/javascript">
-    window.onload = function(){
-      var msgs = document.getElementById('msgs');
-      var ws = new WebSocket('ws://' + window.location.host + window.location.pathname);
-
-      function show(msg){
-          msgs.innerHTML = msg + '<br />' + msgs.innerHTML;
-      }
-
-      ws.onopen    = function()  { show('websocket opened'); };
-      ws.onclose   = function()  { show('websocket closed'); };
-      ws.onmessage = function(message) { show('websocket message: ' +  message.data); };
-    }
-  </script>
   
+    <iframe frameborder="1" id="frame" src="frame.html"></iframe>
+
+    <div id="msgs"></div>
+
+    <script type="text/javascript">
+      window.onload = function(){
+        var msgs = document.getElementById('msgs');
+        var frame = document.getElementById('frame').contentWindow;
+        var ws = new WebSocket('ws://' + window.location.host + window.location.pathname);
+
+        function show(msg){
+            msgs.innerHTML = msg + '<br />' + msgs.innerHTML;
+        }
+
+        ws.onopen    = function()  { show('websocket opened'); };
+        ws.onclose   = function()  { show('websocket closed'); };
+        ws.onmessage = function(message) {
+          show('websocket message: ' +  message.data);
+          frame.postMessage(message.data, '*');
+        };
+      }
+    </script>
+
+  </body>
 </html>
