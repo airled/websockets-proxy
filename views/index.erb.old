@@ -1,0 +1,47 @@
+<html>
+
+  <body>
+     <h1>Simple Echo & Chat Server</h1>
+     <form id="form">
+       <input type="text" id="input"></input>
+     </form>
+     <div id="msgs"></div>
+  </body>
+
+  <script type="text/javascript">
+    window.onload = function(){
+      var msgs = document.getElementById('msgs');
+      var input = document.getElementById('input');
+      var form = document.getElementById('form');
+      var ws = new WebSocket('ws://' + window.location.host + window.location.pathname);
+
+      function show(msg){
+          msgs.innerHTML = msg + '<br />' + msgs.innerHTML;
+      }
+
+      ws.onopen    = function()  { show('websocket opened'); };
+      ws.onclose   = function()  { show('websocket closed'); };
+      ws.onmessage = function(message) { show('websocket message: ' +  message.data); };
+
+      form.onsubmit = function(){
+        ws.send(input.value);
+        input.value = '';
+        return false;
+      }
+    }
+  </script>
+  
+</html>
+
+<!-- <!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+  </head>
+
+  <body>
+  </body>
+
+</html>
+ -->
