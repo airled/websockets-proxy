@@ -26,6 +26,6 @@ get '/' do
 
 end
 
-get '/frame.html' do
-  erb :frame
-end
+# get '/frame.html' do
+#   erb :frame
+# end

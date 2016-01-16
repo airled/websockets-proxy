@@ -6,7 +6,7 @@
       var test = document.getElementById('test');
 
       function listener(event){
-        test.innerHTML = 'Message received';
+        test.innerHTML = event.data;
         var xhr = new XMLHttpRequest();
         xhr.open("GET", event.data, true);
         xhr.onload = function () {
