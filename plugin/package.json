@@ -1,6 +1,6 @@
 {
-  "title": "websocket-proxy",
-  "name": "websocket-proxy",
+  "title": "websockets-proxy",
+  "name": "websockets-proxy",
   "version": "0.0.1",
   "description": "A basic add-on",
   "main": "index.js",
@@ -14,9 +14,9 @@
     "jetpack"
   ],
   "preferences": [{
-    "name": "Requester's address",
-    "title": "Requester's address",
-    "description": "Address of websocket host (websocket server)",
+    "name": "Websocket server address",
+    "title": "Websocket server address",
+    "description": "Websocket server address",
     "type": "string",
     "value": "ws://localhost:4567"
   }]
