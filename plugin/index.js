@@ -1,5 +1,6 @@
-var { ActionButton } = require("sdk/ui/button/action");
+var sourceAddress = require('sdk/simple-prefs').prefs["Requester's address"];
 
+var { ActionButton } = require("sdk/ui/button/action");
 var button = ActionButton({
     id: "Websocket",
     label: "Open websocket",
@@ -9,11 +10,17 @@ var button = ActionButton({
       "64": "./64.png"
     },
     onClick: function(state) {
+        let notification = require("sdk/notifications").notify({
+            title: "Source address: " + sourceAddress
+        });
+
         var panel = require("sdk/panel").Panel({
             contentScriptFile: "./script.js"
         });
+
+        panel.port.emit('sourceAddress', sourceAddress);
         
-        panel.port.on('message', function(message){
+        panel.port.on('request', function(message){
             var request = require("sdk/request").Request({
                 url: message,
                 onComplete: function (response) {
@@ -24,29 +31,9 @@ var button = ActionButton({
         });
 
         panel.port.on('notificate', function(message){
-            var notification = require("sdk/notifications").notify({
+            let notification = require("sdk/notifications").notify({
                 title: message
             });
         });
     }
 });
-
-// var panel = require("sdk/panel").Panel({
-//     contentScriptFile: "./script.js"
-// });
-
-// panel.port.on('message', function(message){
-//     var request = require("sdk/request").Request({
-//         url: message,
-//         onComplete: function (response) {
-//             panel.port.emit('response', response.text)
-//         }
-//     });
-//     request.get();
-// });
-
-// panel.port.on('notificate', function(message){
-//     var notification = require("sdk/notifications").notify({
-//         title: message
-//     });
-// });

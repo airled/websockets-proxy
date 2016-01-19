@@ -12,5 +12,12 @@
   "license": "MIT",
   "keywords": [
     "jetpack"
-  ]
+  ],
+  "preferences": [{
+    "name": "Requester's address",
+    "title": "Requester's address",
+    "description": "Address of websocket host (websocket server)",
+    "type": "string",
+    "value": "ws://localhost:4567"
+  }]
 }
