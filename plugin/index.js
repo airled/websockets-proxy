@@ -1,4 +1,4 @@
-var sourceAddress = require('sdk/simple-prefs').prefs["Requester's address"];
+var sourceAddress = require('sdk/simple-prefs').prefs["Websocket server address"];
 
 var { ActionButton } = require("sdk/ui/button/action");
 var button = ActionButton({
