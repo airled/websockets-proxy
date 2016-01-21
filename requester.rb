@@ -6,3 +6,4 @@ http = Curl::Easy.new('http://localhost:3100') do |req|
 end
 
 http.perform
+p http.body

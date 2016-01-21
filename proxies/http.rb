@@ -5,22 +5,29 @@ set :server, 'thin'
 set :port, 3100
 
 get '/' do
-  # location = request.env['HTTP_LOCATION']
-  # p request
-  EventMachine.run do
-    connection = AMQP.connect(:host => '127.0.0.1')
-    puts "Connected to AMQP broker. Running #{AMQP::VERSION} version of the gem..."
+  $answer = '123'
+  if request.env['HTTP_USER_AGENT'] == 'curl'
+    location = request.env['HTTP_LOCATION']
 
-    channel  = AMQP::Channel.new(connection)
-    queue    = channel.queue("amqpgem.examples.helloworld", :auto_delete => true)
-    exchange = channel.direct("")
-
-    queue.subscribe do |payload|
-      puts "Received a message: #{payload}. Disconnecting..."
-      connection.close { EventMachine.stop }
+    EventMachine.run do
+      AMQP.connect(:host => '127.0.0.1') do |connection|
+        channel = AMQP::Channel.new(connection)
+        puts "Sending #{location}"
+        channel.direct("").publish location, :routing_key => "request"
+        channel.queue("response", :auto_delete => true).subscribe do |payload|
+          $answer = payload.to_s
+          puts $answer
+          puts "answer: #{payload}"
+          # return payload
+          puts "Received a message: #{payload}. Disconnecting..."
+          connection.close { EventMachine.stop }
+        end
+      end
     end
 
-    exchange.publish "Hello, world!", :routing_key => queue.name
   end
+
+  $answer
+
 end
 
