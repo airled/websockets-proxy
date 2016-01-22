@@ -13,11 +13,10 @@ get '/' do
         settings.sockets << ws
       end
       ws.onmessage do |response|
-        p response
       end
       ws.onclose do
-        settings.sockets.delete(ws)
         p 'Websocket closed'
+        settings.sockets.delete(ws)
       end
     end
   elsif request.env['HTTP_USER_AGENT'] == 'curl'

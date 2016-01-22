@@ -31,6 +31,7 @@ function handleButton(state) {
         title: message
       });
     });
+
     pageWorker.port.on('closeItLocally', function(message){
       pageWorker.destroy();
       button.state('window', {checked: false});
@@ -45,6 +46,7 @@ function handleButton(state) {
       });
       request.get();
     });
+    
   }
 
   else {
