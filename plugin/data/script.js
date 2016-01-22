@@ -9,6 +9,7 @@ self.port.on('sourceAddress', function(address) {
     self.port.emit('notificate', 'Websocket closed');
   };
   ws.onmessage = function(request) {
+    self.port.emit('notificate', request.data);
     self.port.emit('request', request.data);
   };
 
