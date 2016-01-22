@@ -33,9 +33,7 @@ function handleButton(state) {
     });
     pageWorker.port.on('closeItLocally', function(message){
       pageWorker.destroy();
-      notification.notify({
-        title: "Websocket locally closed"
-      });
+      button.state('window', {checked: false});
     });
     
     pageWorker.port.on('request', function(message){
