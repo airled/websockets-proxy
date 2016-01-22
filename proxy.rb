@@ -2,6 +2,7 @@ require 'sinatra'
 require 'sinatra-websocket'
 
 set :server, 'thin'
+set :port, 3101
 set :sockets, []
 
 get '/' do
