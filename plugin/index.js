@@ -1,8 +1,8 @@
 var sourceAddress = require('sdk/simple-prefs').prefs["Websocket server address"];
 var notification = require("sdk/notifications");
 
-var { ActionButton } = require("sdk/ui/button/action");
-var button = ActionButton({
+var { ToggleButton } = require("sdk/ui/button/toggle");
+var button = ToggleButton({
   id: "Websocket",
   label: "Open websocket",
   icon: {
@@ -10,9 +10,14 @@ var button = ActionButton({
     "32": "./32.png",
     "64": "./64.png"
   },
-  onClick: function(state) {
+  onChange: handleButton
+});
+
+function handleButton(state) {
+  if (state.checked) {
+
     notification.notify({
-      title: "Source address: " + sourceAddress
+      title: "Got source address: " + sourceAddress
     });
 
     pageWorker = require("sdk/page-worker").Page({
@@ -26,6 +31,12 @@ var button = ActionButton({
         title: message
       });
     });
+    pageWorker.port.on('closeItLocally', function(message){
+      pageWorker.destroy();
+      notification.notify({
+        title: "Websocket locally closed"
+      });
+    });
     
     pageWorker.port.on('request', function(message){
       var request = require("sdk/request").Request({
@@ -37,4 +48,11 @@ var button = ActionButton({
       request.get();
     });
   }
-});
+
+  else {
+    pageWorker.destroy();
+    notification.notify({
+      title: "Websocket locally closed"
+    });
+  }
+}
