@@ -4,7 +4,7 @@ var notification = require("sdk/notifications");
 var { ToggleButton } = require("sdk/ui/button/toggle");
 var button = ToggleButton({
   id: "Websocket",
-  label: "Open websocket",
+  label: "Open a websocket",
   icon: {
     "16": "./16.png",
     "32": "./32.png",

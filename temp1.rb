@@ -7,7 +7,6 @@ EventMachine.run do
       puts "Received #{payload} from proxy"
       puts "Sending 'OHHAI' to proxy"
       channel.direct("").publish "OHHAI", :routing_key => "response"
-      connection.close { EventMachine.stop }
     end
   end
 end
