@@ -2,10 +2,12 @@ GEM
   remote: https://rubygems.org/
   specs:
     addressable (2.4.0)
-    amq-protocol (1.9.2)
-    amqp (1.5.1)
-      amq-protocol (~> 1.9)
+    amq-protocol (2.0.1)
+    amqp (1.5.0)
+      amq-protocol (>= 1.9.2)
       eventmachine
+    bunny (2.2.2)
+      amq-protocol (>= 2.0.1)
     curb (0.9.1)
     daemons (1.2.3)
     em-websocket (0.3.8)
@@ -37,6 +39,7 @@ PLATFORMS
 
 DEPENDENCIES
   amqp
+  bunny
   curb
   foreman
   sinatra

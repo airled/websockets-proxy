@@ -1,8 +1,11 @@
-require "amqp"
+require "bunny"
 
-EventMachine.run do
-  AMQP.connect(:host => '127.0.0.1') do |connection|
-    channel  = AMQP::Channel.new(connection)
-    channel.direct("").publish "BLABLABLA", :routing_key => "response"
-  end
-end
+conn = Bunny.new
+conn.start
+
+ch = conn.create_channel
+x  = ch.default_exchange
+
+x.publish("Hello!", :routing_key => q.name)
+
+conn.close
