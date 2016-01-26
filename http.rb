@@ -6,10 +6,17 @@ set :port, 3100
 
 get '/*' do
 
+  type = 
+    if request.env['REQUEST_URI'].include?('.css')
+      "text/css"
+    end
+
   answer = ''
 
   host_to = request.env['HTTP_HOST']
   resource_to = request.env['REQUEST_URI']
+  method = request.env['REQUEST_METHOD']
+  
   location = "http://#{host_to}#{resource_to}"
 
   conn = Bunny.new
@@ -23,12 +30,13 @@ get '/*' do
 
   q.subscribe(:block => true) do |delivery_info, metadata, payload|
     # puts payload
-    answer << payload
+    answer = payload
     delivery_info.consumer.cancel
   end
   
   conn.close
 
+  content_type type
   answer
 
 end
