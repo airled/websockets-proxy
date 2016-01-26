@@ -20,11 +20,14 @@ get '/' do
 
     x.publish(location, :routing_key => 'request')
 
-    q.subscribe do |delivery_info, metadata, payload|
+    q.subscribe(:block => true) do |delivery_info, metadata, payload|
+      # puts payload
       answer << payload
+      delivery_info.consumer.cancel
     end
-
+    
     conn.close
+
   end
 
   answer
