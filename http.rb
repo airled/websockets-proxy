@@ -1,23 +1,30 @@
 require 'sinatra'
+require "sinatra/multi_route"
 require "bunny"
+require 'json'
 
 set :server, 'thin'
 set :port, 3100
 
-get '/*' do
+route :get, :post, :put, :patch, :delete, :head, :options, '/*' do
 
-  type = 
-    if request.env['REQUEST_URI'].include?('.css')
-      "text/css"
-    end
+  # p request.env
 
-  answer = ''
+  # type = 
+  #   if request.env['REQUEST_URI'].include?('.css')
+  #     "text/css"
+  #   end
 
-  host_to = request.env['HTTP_HOST']
-  resource_to = request.env['REQUEST_URI']
+  # answer = ''
+
+  host = request.env['HTTP_HOST']
+  resource = request.env['REQUEST_URI']
   method = request.env['REQUEST_METHOD']
+  query = request.env['rack.request.form_hash']
   
-  location = "http://#{host_to}#{resource_to}"
+  location = "http://#{host}#{resource}"
+
+  data = {location: location, method: method, query: query}.to_json
 
   conn = Bunny.new
   conn.start
@@ -26,10 +33,9 @@ get '/*' do
   q = ch.queue("response", :auto_delete => true)
   x = ch.default_exchange
 
-  x.publish(location, :routing_key => 'request')
+  x.publish(data, :routing_key => 'request')
 
   q.subscribe(:block => true) do |delivery_info, metadata, payload|
-    # puts payload
     answer = payload
     delivery_info.consumer.cancel
   end

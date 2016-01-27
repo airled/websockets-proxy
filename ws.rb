@@ -27,14 +27,11 @@ get '/' do
     x = ch.default_exchange
 
     q.subscribe do |delivery_info, metadata, payload|
-    # q.subscribe(:block => true) do |delivery_info, metadata, payload|
-      # p "Got #{payload}"
       settings.sockets[0].send(payload)
-      # delivery_info.consumer.cancel
+      p payload
     end
     
     ws.onmessage do |response|
-      # p response
       x.publish(response, :routing_key => 'response')
     end
 
