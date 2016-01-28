@@ -2,47 +2,47 @@ require 'sinatra'
 require "sinatra/multi_route"
 require "bunny"
 require 'json'
+require 'colorize'
 
 set :server, 'thin'
 set :port, 3100
 
 route :get, :post, :put, :patch, :delete, :head, :options, '/*' do
 
-  # p request.env
+  req = request.env
+  p req
 
-  # type = 
-  #   if request.env['REQUEST_URI'].include?('.css')
-  #     "text/css"
-  #   end
-
-  # answer = ''
-
-  host = request.env['HTTP_HOST']
-  resource = request.env['REQUEST_URI']
-  method = request.env['REQUEST_METHOD']
-  query = request.env['rack.request.form_hash']
+  host = req['HTTP_HOST']
+  resource = req['REQUEST_URI']
+  method = req['REQUEST_METHOD']
+  query = req['rack.request.form_hash']
+  cookies = req['HTTP_COOKIE']
   
   location = "http://#{host}#{resource}"
 
-  data = {location: location, method: method, query: query}.to_json
+  data = {location: location, method: method, query: query, cookies: cookies}.to_json
 
-  conn = Bunny.new
-  conn.start
-  ch = conn.create_channel
+  puts data.colorize(:red)
 
-  q = ch.queue("response", :auto_delete => true)
-  x = ch.default_exchange
+  puts JSON.parse(data)
 
-  x.publish(data, :routing_key => 'request')
+  # conn = Bunny.new
+  # conn.start
+  # ch = conn.create_channel
 
-  q.subscribe(:block => true) do |delivery_info, metadata, payload|
-    answer = payload
-    delivery_info.consumer.cancel
-  end
+  # q = ch.queue("response", :auto_delete => true)
+  # x = ch.default_exchange
+
+  # x.publish(data, :routing_key => 'request')
+
+  # q.subscribe(:block => true) do |delivery_info, metadata, payload|
+  #   answer = payload
+  #   delivery_info.consumer.cancel
+  # end
   
-  conn.close
+  # conn.close
 
-  content_type type
-  answer
+  # content_type type "text/css" if req['REQUEST_URI'].include?('.css')
+  # answer
 
 end
