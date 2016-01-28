@@ -6,41 +6,40 @@ require 'json'
 set :server, 'thin'
 set :port, 3100
 
-route :get, :post, :put, :patch, :delete, :head, :options, '/*' do
-  answer = ''
-  req = request.env
-  # p req
-
-  host = req['HTTP_HOST']
-  resource = req['REQUEST_URI']
-  method = req['REQUEST_METHOD']
-  query = req['rack.request.form_hash']
-  cookies = req['HTTP_COOKIE']
-  
+def get_data(request_env)
+  host = request_env['HTTP_HOST']
+  resource = request_env['REQUEST_URI']
+  method = request_env['REQUEST_METHOD']
+  query = request_env['rack.request.form_hash']
+  cookies = request_env['HTTP_COOKIE']
   location = "http://#{host}#{resource}"
+  {location: location, method: method, query: query, cookies: cookies}
+end
 
-  data = {location: location, method: method, query: query, cookies: cookies}.to_json
+route :get, :post, :put, :patch, :delete, :head, :options, '/*' do
+  # p params
+  # data = get_data(request.env)
+  # p data
+  # answer = ''
+  # data = get_data(request.env).to_json
 
-  # puts data.colorize(:red)
-  # puts JSON.parse(data)
+  # conn = Bunny.new
+  # conn.start
+  # ch = conn.create_channel
 
-  conn = Bunny.new
-  conn.start
-  ch = conn.create_channel
+  # q = ch.queue("response", :auto_delete => true)
+  # x = ch.default_exchange
 
-  q = ch.queue("response", :auto_delete => true)
-  x = ch.default_exchange
+  # x.publish(data, :routing_key => 'request')
 
-  x.publish(data, :routing_key => 'request')
-
-  q.subscribe(:block => true) do |delivery_info, metadata, payload|
-    answer = payload
-    delivery_info.consumer.cancel
-  end
+  # q.subscribe(:block => true) do |delivery_info, metadata, payload|
+  #   answer = payload
+  #   delivery_info.consumer.cancel
+  # end
   
-  conn.close
+  # conn.close
 
-  content_type "text/css" if req['REQUEST_URI'].include?('.css')
-  answer
+  # content_type "text/css" if req['REQUEST_URI'].include?('.css')
+  # answer
 
 end
