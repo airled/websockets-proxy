@@ -25,8 +25,8 @@ get '/' do
     x = ch.default_exchange
 
     q.subscribe do |delivery_info, metadata, payload|
-      p JSON.parse(payload)
-      # ws.send(payload)
+      # p JSON.parse(payload)
+      ws.send(payload)
     end
     
     ws.onmessage do |response|

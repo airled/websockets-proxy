@@ -38,13 +38,32 @@ function handleButton(state) {
     });
     
     pageWorker.port.on('request', function(message){
-      var request = require("sdk/request").Request({
-        url: message,
-        onComplete: function (response) {
-          pageWorker.port.emit('response', response.text)
-        }
-      });
-      request.get();
+      var data = JSON.parse(message);
+      var location = data.location;
+      var method = data.method;
+      var query = data.query;
+      var cookies = data.cookies;
+      switch (method) {
+        case 'GET':
+          var request = require("sdk/request").Request({
+            url: location,
+            onComplete: function(response){
+              pageWorker.port.emit('response', response.text)
+            }
+          });
+          request.get();
+          break;
+        case 'POST':
+          var request = require("sdk/request").Request({
+            url: location,
+            content: query,
+            onComplete: function(response){
+              pageWorker.port.emit('response', response.text)
+            }
+          });
+          request.post();
+          break;
+      }
     });
     
   }

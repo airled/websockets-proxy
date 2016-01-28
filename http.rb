@@ -2,15 +2,14 @@ require 'sinatra'
 require "sinatra/multi_route"
 require "bunny"
 require 'json'
-require 'colorize'
 
 set :server, 'thin'
 set :port, 3100
 
 route :get, :post, :put, :patch, :delete, :head, :options, '/*' do
-
+  answer = ''
   req = request.env
-  p req
+  # p req
 
   host = req['HTTP_HOST']
   resource = req['REQUEST_URI']
@@ -22,27 +21,26 @@ route :get, :post, :put, :patch, :delete, :head, :options, '/*' do
 
   data = {location: location, method: method, query: query, cookies: cookies}.to_json
 
-  puts data.colorize(:red)
+  # puts data.colorize(:red)
+  # puts JSON.parse(data)
 
-  puts JSON.parse(data)
+  conn = Bunny.new
+  conn.start
+  ch = conn.create_channel
 
-  # conn = Bunny.new
-  # conn.start
-  # ch = conn.create_channel
+  q = ch.queue("response", :auto_delete => true)
+  x = ch.default_exchange
 
-  # q = ch.queue("response", :auto_delete => true)
-  # x = ch.default_exchange
+  x.publish(data, :routing_key => 'request')
 
-  # x.publish(data, :routing_key => 'request')
-
-  # q.subscribe(:block => true) do |delivery_info, metadata, payload|
-  #   answer = payload
-  #   delivery_info.consumer.cancel
-  # end
+  q.subscribe(:block => true) do |delivery_info, metadata, payload|
+    answer = payload
+    delivery_info.consumer.cancel
+  end
   
-  # conn.close
+  conn.close
 
-  # content_type type "text/css" if req['REQUEST_URI'].include?('.css')
-  # answer
+  content_type "text/css" if req['REQUEST_URI'].include?('.css')
+  answer
 
 end
