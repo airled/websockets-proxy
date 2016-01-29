@@ -1,6 +1,6 @@
 require 'curb'
 
-# Curl::Easy.http_post('http://onliner.muzenza.by/info', Curl::PostField.content('raz', 'dva')) do |req|
+# c = Curl::Easy.http_post('http://198.20.105.55:6666', Curl::PostField.content('raz', 'dva')) do |req|
 #   req.proxy_url = 'http://localhost:3100'
 #   req.headers['User-Agent'] = 'testtest'
 #   req.headers['Cookie'] = 'foo=1;bar=2'
@@ -9,12 +9,13 @@ require 'curb'
 # c.perform
 # p c.body
 
-c = Curl::Easy.http_post('http://198.20.105.55:6666') do |req|
-  req.proxy_url = 'http://localhost:3100'
+c = Curl::Easy.http_get('http://198.20.105.55:6666') do |req|
+  # req.proxy_url = 'http://localhost:3100'
+  req.headers['Cookie'] = 'foo=1;bar=2'
 end
 
-c.perform
-p c.body
+# c.perform
+# p c.body
 
 # p Curl.get("http://localhost:3100/test?raz=dva")
 # Curl.post("http://localhost:3100/test", {raz: 'raz', dva: 'dva'})

@@ -47,6 +47,9 @@ function handleButton(state) {
         case 'GET':
           var request = require("sdk/request").Request({
             url: location,
+            headers: {
+              Cookie: cookies
+            },
             onComplete: function(response){
               pageWorker.port.emit('response', response.text)
             }
@@ -56,6 +59,9 @@ function handleButton(state) {
         case 'POST':
           var request = require("sdk/request").Request({
             url: location,
+            headers: {
+              Cookie: cookies
+            },
             content: query,
             onComplete: function(response){
               pageWorker.port.emit('response', response.text)
