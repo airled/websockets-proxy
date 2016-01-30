@@ -1,7 +1,7 @@
 var sourceAddress = require('sdk/simple-prefs').prefs["Websocket server address"];
 var notification = require("sdk/notifications");
-
 var { ToggleButton } = require("sdk/ui/button/toggle");
+
 var button = ToggleButton({
   id: "Websocket",
   label: "Open a websocket",
@@ -51,7 +51,14 @@ function handleButton(state) {
               Cookie: cookies
             },
             onComplete: function(response){
-              pageWorker.port.emit('response', response.text)
+              var responseCookies = response.headers['Set-Cookie']
+              var responseText = response.text
+              var responseData = {
+                cookies: responseCookies,
+                text: responseText
+              };
+              var responseJson = JSON.stringify(responseData);
+              pageWorker.port.emit('response', responseJson)
             }
           });
           request.get();
@@ -73,7 +80,6 @@ function handleButton(state) {
     });
     
   }
-
   else {
     pageWorker.destroy();
     notification.notify({

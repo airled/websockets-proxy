@@ -9,7 +9,6 @@ set :port, 3101
 get '/' do
 
   request.websocket do |ws|
-
     ws.onopen do
       puts 'Websocket opened'
     end
@@ -20,7 +19,6 @@ get '/' do
     conn = Bunny.new
     conn.start
     ch = conn.create_channel
-
     q = ch.queue("request", :auto_delete => true)
     x = ch.default_exchange
 

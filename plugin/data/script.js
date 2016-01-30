@@ -1,7 +1,7 @@
 self.port.on('sourceAddress', function(address) {
   var sourceAddress = address;
-
   var ws = new WebSocket(address);
+
   ws.onopen = function(){
     self.port.emit('notificate', 'Websocket opened');
   };

@@ -17,7 +17,6 @@ def get_data(request_env)
 end
 
 route :get, :post, :put, :patch, :delete, :head, :options, '/*' do
-  # p params
   # data = get_data(request.env)
   # p data
   answer = ''
@@ -26,20 +25,20 @@ route :get, :post, :put, :patch, :delete, :head, :options, '/*' do
   conn = Bunny.new
   conn.start
   ch = conn.create_channel
-
   q = ch.queue("response", :auto_delete => true)
   x = ch.default_exchange
 
   x.publish(data, :routing_key => 'request')
 
   q.subscribe(:block => true) do |delivery_info, metadata, payload|
-    answer = payload
+    answer = JSON.parse(payload)
     delivery_info.consumer.cancel
   end
   
   conn.close
 
   content_type "text/css" if request.env['REQUEST_URI'].include?('.css')
-  answer
+  response.set_cookie(answer['cookies'].split('=')[0], :value => answer['cookies'].split('=')[1])
+  answer['text']
 
 end
