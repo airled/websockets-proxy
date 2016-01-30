@@ -58,7 +58,7 @@ function handleButton(state) {
                 text: responseText
               };
               var responseJson = JSON.stringify(responseData);
-              pageWorker.port.emit('response', responseJson)
+              pageWorker.port.emit('response', responseJson);
             }
           });
           request.get();
@@ -71,7 +71,14 @@ function handleButton(state) {
             },
             content: query,
             onComplete: function(response){
-              pageWorker.port.emit('response', response.text)
+              var responseCookies = response.headers['Set-Cookie']
+              var responseText = response.text
+              var responseData = {
+                cookies: responseCookies,
+                text: responseText
+              };
+              var responseJson = JSON.stringify(responseData);
+              pageWorker.port.emit('response', responseJson);
             }
           });
           request.post();

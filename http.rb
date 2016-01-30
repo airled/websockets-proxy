@@ -38,7 +38,7 @@ route :get, :post, :put, :patch, :delete, :head, :options, '/*' do
   conn.close
 
   content_type "text/css" if request.env['REQUEST_URI'].include?('.css')
-  response.set_cookie(answer['cookies'].split('=')[0], :value => answer['cookies'].split('=')[1])
+  response.set_cookie(answer['cookies'].split('=')[0], :value => answer['cookies'].split('=')[1]) if answer['cookies']
   answer['text']
 
 end

@@ -6,15 +6,13 @@ require 'curb'
 #   req.headers['Cookie'] = 'foo=1;bar=2'
 # end
 
-# c.perform
 # p c.body
 
-c = Curl::Easy.http_get('http://198.20.105.55:6666') do |req|
+c = Curl::Easy.http_post('http://198.20.105.55:6666') do |req|
   req.proxy_url = 'http://localhost:3100'
   req.headers['Cookie'] = 'foo=1;bar=2'
 end
 
-c.perform
 puts c.head
 puts "/////////////////////////////////////"
 puts c.body
