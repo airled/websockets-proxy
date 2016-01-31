@@ -38,18 +38,18 @@ function handleButton(state) {
     });
     
     pageWorker.port.on('request', function(message){
-      var data = JSON.parse(message);
-      var location = data.location;
-      var method = data.method;
-      var query = data.query;
-      var cookies = data.cookies;
+      var data = JSON.parse(message); //basic request json with all the data
+      var url = data.url;   //request location like "http://example.com:1234/mydata"
+      var method = data.method;       //request method
+      var query = data.query;         //request query for non-get methods
+      var cookies = data.cookies;     //request cookies
       switch (method) {
         case 'GET':
           var request = require("sdk/request").Request({
-            url: location,
+            url: url,
             headers: {
-              Cookie: cookies,
-              // User-Agent: agent
+              // User-Agent: agent,
+              Cookie: cookies
             },
             onComplete: function(response){
               var responseCookies = response.headers['Set-Cookie']
@@ -66,10 +66,10 @@ function handleButton(state) {
           break;
         case 'POST':
           var request = require("sdk/request").Request({
-            url: location,
+            url: url,
             headers: {
+              // User-Agent: agent,
               Cookie: cookies
-              // User-Agent: agent
             },
             content: query,
             onComplete: function(response){

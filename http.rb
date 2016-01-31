@@ -13,14 +13,12 @@ def get_data(request_env)
   query = request_env['rack.request.form_hash']
   cookies = request_env['HTTP_COOKIE']
   agent = request_env['HTTP_USER_AGENT']
-  location = "http://#{host}#{resource}"
-  {location: location, method: method, query: query, cookies: cookies, agent: agent}
+  url = "http://#{host}#{resource}"
+  {url: url, method: method, query: query, cookies: cookies, agent: agent}
 end
 
-route :get, :post, :put, :patch, :delete, :head, :options, '/*' do
-  # data = get_data(request.env)
-  # p data
-  answer = ''
+route :get, :post, :put, :delete, :head, '/*' do
+ 
   data = get_data(request.env).to_json
 
   conn = Bunny.new
@@ -30,6 +28,8 @@ route :get, :post, :put, :patch, :delete, :head, :options, '/*' do
   x = ch.default_exchange
 
   x.publish(data, :routing_key => 'request')
+  
+  answer = ''
 
   q.subscribe(:block => true) do |delivery_info, metadata, payload|
     answer = JSON.parse(payload)
@@ -39,7 +39,7 @@ route :get, :post, :put, :patch, :delete, :head, :options, '/*' do
   conn.close
 
   content_type "text/css" if request.env['REQUEST_URI'].include?('.css')
-  # response.set_cookie(answer['cookies'].split('=')[0], :value => answer['cookies'].split('=')[1]) if answer['cookies']
+  response.set_cookie(answer['cookies'].split('=')[0], :value => answer['cookies'].split('=')[1]) if answer['cookies']
   answer['text']
   # p answer['cookies'].gsub("\n", ";")
 
