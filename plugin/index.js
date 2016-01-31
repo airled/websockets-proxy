@@ -48,7 +48,8 @@ function handleButton(state) {
           var request = require("sdk/request").Request({
             url: location,
             headers: {
-              Cookie: cookies
+              Cookie: cookies,
+              // User-Agent: agent
             },
             onComplete: function(response){
               var responseCookies = response.headers['Set-Cookie']
@@ -68,6 +69,7 @@ function handleButton(state) {
             url: location,
             headers: {
               Cookie: cookies
+              // User-Agent: agent
             },
             content: query,
             onComplete: function(response){

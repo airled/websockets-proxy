@@ -12,8 +12,9 @@ def get_data(request_env)
   method = request_env['REQUEST_METHOD']
   query = request_env['rack.request.form_hash']
   cookies = request_env['HTTP_COOKIE']
+  agent = request_env['HTTP_USER_AGENT']
   location = "http://#{host}#{resource}"
-  {location: location, method: method, query: query, cookies: cookies}
+  {location: location, method: method, query: query, cookies: cookies, agent: agent}
 end
 
 route :get, :post, :put, :patch, :delete, :head, :options, '/*' do
@@ -38,7 +39,8 @@ route :get, :post, :put, :patch, :delete, :head, :options, '/*' do
   conn.close
 
   content_type "text/css" if request.env['REQUEST_URI'].include?('.css')
-  response.set_cookie(answer['cookies'].split('=')[0], :value => answer['cookies'].split('=')[1]) if answer['cookies']
+  # response.set_cookie(answer['cookies'].split('=')[0], :value => answer['cookies'].split('=')[1]) if answer['cookies']
   answer['text']
+  # p answer['cookies'].gsub("\n", ";")
 
 end
