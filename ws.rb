@@ -24,11 +24,12 @@ get '/' do
 
     q.subscribe do |delivery_info, metadata, payload|
       ws.send(payload)
-      ws.onmessage do |response|
-        x.publish(response, :routing_key => metadata[:reply_to])
-      end
     end
-    
+
+    ws.onmessage do |response|
+      reply_to = JSON.parse(response)['reply_to']
+      x.publish(response, :routing_key => reply_to)
+    end
 
   end #websocket
 end #get

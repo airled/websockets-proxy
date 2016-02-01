@@ -45,6 +45,7 @@ function handleButton(state) {
       var cookies = data.cookies;     //request cookies
       var agent = data.agent;         //request user-agent
       var referer = data.referer;     //request referer
+      var reply_to = data.reply_to;
       switch (method) {
         case 'GET':
           var request = require("sdk/request").Request({
@@ -61,7 +62,8 @@ function handleButton(state) {
               var responseData = {
                 cookies: responseCookies,
                 type: responseType,
-                text: responseText
+                text: responseText,
+                reply_to: reply_to
               };
               var responseJson = JSON.stringify(responseData);
               pageWorker.port.emit('response', responseJson);
@@ -85,7 +87,8 @@ function handleButton(state) {
               var responseData = {
                 cookies: responseCookies,
                 type: responseType,
-                text: responseText
+                text: responseText,
+                reply_to: reply_to
               };
               var responseJson = JSON.stringify(responseData);
               pageWorker.port.emit('response', responseJson);

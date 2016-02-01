@@ -20,7 +20,7 @@ end
 
 route :get, :post, :put, :delete, :head, '/*' do
  
-  data = get_data(request.env).to_json
+  data_hash = get_data(request.env)
 
   conn = Bunny.new
   conn.start
@@ -28,7 +28,7 @@ route :get, :post, :put, :delete, :head, '/*' do
   q = ch.queue("", :exclusive => true, :auto_delete => true)
   x = ch.default_exchange
 
-  x.publish(data, :routing_key => 'request', :reply_to => q.name)
+  x.publish(data_hash.merge(reply_to: q.name).to_json, :routing_key => 'request')
   
   answer = ''
 
