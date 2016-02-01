@@ -25,10 +25,10 @@ route :get, :post, :put, :delete, :head, '/*' do
   conn = Bunny.new
   conn.start
   ch = conn.create_channel
-  q = ch.queue("response", :auto_delete => true)
+  q = ch.queue("", :exclusive => true, :auto_delete => true)
   x = ch.default_exchange
 
-  x.publish(data, :routing_key => 'request')
+  x.publish(data, :routing_key => 'request', :reply_to => q.name)
   
   answer = ''
 
@@ -42,6 +42,5 @@ route :get, :post, :put, :delete, :head, '/*' do
   content_type answer['type']
   response.set_cookie(answer['cookies'].split('=')[0], :value => answer['cookies'].split('=')[1]) if answer['cookies']
   answer['text']
-  # p answer['cookies'].gsub("\n", ";")
 
 end
