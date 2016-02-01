@@ -56,9 +56,11 @@ function handleButton(state) {
             },
             onComplete: function(response){
               var responseCookies = response.headers['Set-Cookie']
+              var responseType = response.headers['Content-Type']
               var responseText = response.text
               var responseData = {
                 cookies: responseCookies,
+                type: responseType,
                 text: responseText
               };
               var responseJson = JSON.stringify(responseData);
@@ -78,9 +80,11 @@ function handleButton(state) {
             content: query,
             onComplete: function(response){
               var responseCookies = response.headers['Set-Cookie']
+              var responseType = response.headers['Content-Type']
               var responseText = response.text
               var responseData = {
                 cookies: responseCookies,
+                type: responseType,
                 text: responseText
               };
               var responseJson = JSON.stringify(responseData);
