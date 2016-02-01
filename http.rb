@@ -10,7 +10,7 @@ def get_data(request_env)
   host = request_env['HTTP_HOST']
   resource = request_env['REQUEST_URI']
   method = request_env['REQUEST_METHOD']
-  query = request_env['rack.request.form_hash']
+  query = request_env['rack.request.form_vars']
   cookies = request_env['HTTP_COOKIE']
   agent = request_env['HTTP_USER_AGENT']
   referer = request_env['HTTP_REFERER']
