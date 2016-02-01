@@ -39,16 +39,19 @@ function handleButton(state) {
     
     pageWorker.port.on('request', function(message){
       var data = JSON.parse(message); //basic request json with all the data
-      var url = data.url;   //request location like "http://example.com:1234/mydata"
+      var url = data.url;             //request location like "http://example.com:1234/mydata"
       var method = data.method;       //request method
       var query = data.query;         //request query for non-get methods
       var cookies = data.cookies;     //request cookies
+      var agent = data.agent;         //request user-agent
+      var referer = data.referer;     //request referer
       switch (method) {
         case 'GET':
           var request = require("sdk/request").Request({
             url: url,
             headers: {
               // User-Agent: agent,
+              Referer: referer,
               Cookie: cookies
             },
             onComplete: function(response){
@@ -69,6 +72,7 @@ function handleButton(state) {
             url: url,
             headers: {
               // User-Agent: agent,
+              Referer: referer,
               Cookie: cookies
             },
             content: query,

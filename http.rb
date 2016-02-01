@@ -13,8 +13,9 @@ def get_data(request_env)
   query = request_env['rack.request.form_hash']
   cookies = request_env['HTTP_COOKIE']
   agent = request_env['HTTP_USER_AGENT']
+  referer = request_env['HTTP_REFERER']
   url = "http://#{host}#{resource}"
-  {url: url, method: method, query: query, cookies: cookies, agent: agent}
+  {url: url, method: method, query: query, cookies: cookies, agent: agent, referer: referer}
 end
 
 route :get, :post, :put, :delete, :head, '/*' do
