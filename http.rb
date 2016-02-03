@@ -19,7 +19,6 @@ def get_data(request_env)
 end
 
 route :get, :post, :put, :delete, :head, '/*' do
- 
   data_hash = get_data(request.env)
 
   conn = Bunny.new

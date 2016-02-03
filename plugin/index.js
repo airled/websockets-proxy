@@ -51,9 +51,9 @@ function handleButton(state) {
           var request = require("sdk/request").Request({
             url: url,
             headers: {
-              // User-Agent: agent,
-              Referer: referer,
-              Cookie: cookies
+              'User-Agent': agent,
+              'Referer': referer,
+              'Cookie': cookies
             },
             onComplete: function(response){
               var responseCookies = response.headers['Set-Cookie']
@@ -75,9 +75,9 @@ function handleButton(state) {
           var request = require("sdk/request").Request({
             url: url,
             headers: {
-              // User-Agent: agent,
-              Referer: referer,
-              Cookie: cookies
+              'User-Agent': agent,
+              'Referer': referer,
+              'Cookie': cookies
             },
             content: query,
             onComplete: function(response){

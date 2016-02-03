@@ -7,7 +7,6 @@ set :server, 'thin'
 set :port, 3101
 
 get '/' do
-
   request.websocket do |ws|
     ws.onopen do
       puts 'Websocket opened'
