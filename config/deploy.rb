@@ -47,3 +47,13 @@ task :deploy => :environment do
     end
   end
 end
+
+desc "Starts the application remotely."
+task :start => :environment do
+  queue "cd current && rake start"
+end
+
+desc "Stops the application remotely."
+task :start => :environment do
+  queue "cd current && rake stop"
+end

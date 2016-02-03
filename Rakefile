@@ -15,3 +15,7 @@ task :stop do
     end
   end
 end
+
+task :deploy
+ system 'mina stop && mina deploy && mina start'
+end
