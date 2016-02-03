@@ -57,3 +57,8 @@ desc "Stops the application remotely."
 task :stop => :environment do
   queue "cd current && rake stop"
 end
+
+desc "Restarts the application remotely."
+task :restart => :environment do
+  queue "cd current && rake restart"
+end

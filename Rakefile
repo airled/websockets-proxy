@@ -1,6 +1,7 @@
 task :start do
   system('bundle exec thin -R config/config_http.ru -C config/thin_http.yml start')
   system('bundle exec thin -R config/config_ws.ru -C config/thin_ws.yml start')
+  puts "Started"
 end
 
 task :stop do
@@ -14,6 +15,11 @@ task :stop do
       puts "Thin (pid #{pid}) stopped"
     end
   end
+end
+
+task :restart do
+  Rake::Task['stop'].invoke
+  Rake::Task['start'].invoke
 end
 
 task :deploy do
