@@ -37,33 +37,24 @@ function handleButton(state) {
       button.state('window', {checked: false});
     });
     
-    pageWorker.port.on('request', function(message){
-      var data = JSON.parse(message); //basic request json with all the data
-      var url = data.url;             //request location like "http://example.com:1234/mydata"
-      var method = data.method;       //request method
-      var query = data.query;         //request query for non-get methods
-      var cookies = data.cookies;     //request cookies
-      var agent = data.agent;         //request user-agent
-      var referer = data.referer;     //request referer
-      var reply_to = data.reply_to;
-      switch (method) {
+    pageWorker.port.on('request', function(request){
+      var data = JSON.parse(request);
+      // data = {url, method, query, cookies, agent, referer, reply_to} of request
+      switch (data.method) {
         case 'GET':
           var request = require("sdk/request").Request({
-            url: url,
+            url: data.url,
             headers: {
-              'User-Agent': agent,
-              'Referer': referer,
-              'Cookie': cookies
+              'User-Agent': data.agent,
+              'Referer': data.referer,
+              'Cookie': data.cookies
             },
             onComplete: function(response){
-              var responseCookies = response.headers['Set-Cookie']
-              var responseType = response.headers['Content-Type']
-              var responseText = response.text
               var responseData = {
-                cookies: responseCookies,
-                type: responseType,
-                text: responseText,
-                reply_to: reply_to
+                cookies: response.headers['Set-Cookie'],
+                type: response.headers['Content-Type'],
+                text: response.text,
+                reply_to: data.reply_to
               };
               var responseJson = JSON.stringify(responseData);
               pageWorker.port.emit('response', responseJson);
@@ -73,22 +64,19 @@ function handleButton(state) {
           break;
         case 'POST':
           var request = require("sdk/request").Request({
-            url: url,
+            url: data.url,
             headers: {
-              'User-Agent': agent,
-              'Referer': referer,
-              'Cookie': cookies
+              'User-Agent': data.agent,
+              'Referer': data.referer,
+              'Cookie': data.cookies
             },
-            content: query,
+            content: data.query,
             onComplete: function(response){
-              var responseCookies = response.headers['Set-Cookie']
-              var responseType = response.headers['Content-Type']
-              var responseText = response.text
               var responseData = {
-                cookies: responseCookies,
-                type: responseType,
-                text: responseText,
-                reply_to: reply_to
+                cookies: response.headers['Set-Cookie'],
+                type: response.headers['Content-Type'],
+                text: response.text,
+                reply_to: data.reply_to
               };
               var responseJson = JSON.stringify(responseData);
               pageWorker.port.emit('response', responseJson);
