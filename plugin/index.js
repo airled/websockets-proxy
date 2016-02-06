@@ -1,6 +1,6 @@
-var sourceAddress = require('sdk/simple-prefs').prefs["Websocket server address"];
-var notification = require("sdk/notifications");
-var { ToggleButton } = require("sdk/ui/button/toggle");
+var sourceAddress = require('sdk/simple-prefs').prefs["Websocket server address"],
+    notification = require("sdk/notifications"),
+    { ToggleButton } = require("sdk/ui/button/toggle");
 
 var button = ToggleButton({
   id: "Websocket",
@@ -15,10 +15,7 @@ var button = ToggleButton({
 
 function handleButton(state) {
   if (state.checked) {
-
-    notification.notify({
-      title: "Got source address: " + sourceAddress
-    });
+    notification.notify({ title: "Got source address: " + sourceAddress });
 
     pageWorker = require("sdk/page-worker").Page({
       contentScriptFile: "./script.js"
@@ -26,72 +23,60 @@ function handleButton(state) {
 
     pageWorker.port.emit('sourceAddress', sourceAddress);
     
-    pageWorker.port.on('notificate', function(message){
-      notification.notify({
-        title: message
-      });
+    pageWorker.port.on('notificate', function(message) {
+      notification.notify({ title: message });
     });
 
-    pageWorker.port.on('closeItLocally', function(message){
+    pageWorker.port.on('closeItLocally', function(message) {
       pageWorker.destroy();
       button.state('window', {checked: false});
     });
     
-    pageWorker.port.on('request', function(request){
+    /////////////////REQUEST HANDLER/////////////////
+    
+    pageWorker.port.on('request', function(request) {
       var data = JSON.parse(request);
       // data = {url, method, query, cookies, agent, referer, reply_to} of request
+      var request = require("sdk/request").Request({
+        url: data.url,
+        headers: {
+          'User-Agent': data.agent,
+          'Referer': data.referer,
+          'Cookie': data.cookies
+        },
+        content: data.query,
+        onComplete: function(response) {
+          var responseData = {
+            cookies: response.headers['Set-Cookie'],
+            type: response.headers['Content-Type'],
+            text: response.text,
+            reply_to: data.reply_to
+          };
+          var responseJson = JSON.stringify(responseData);
+          pageWorker.port.emit('response', responseJson);
+        }
+      });
       switch (data.method) {
         case 'GET':
-          var request = require("sdk/request").Request({
-            url: data.url,
-            headers: {
-              'User-Agent': data.agent,
-              'Referer': data.referer,
-              'Cookie': data.cookies
-            },
-            onComplete: function(response){
-              var responseData = {
-                cookies: response.headers['Set-Cookie'],
-                type: response.headers['Content-Type'],
-                text: response.text,
-                reply_to: data.reply_to
-              };
-              var responseJson = JSON.stringify(responseData);
-              pageWorker.port.emit('response', responseJson);
-            }
-          });
           request.get();
           break;
         case 'POST':
-          var request = require("sdk/request").Request({
-            url: data.url,
-            headers: {
-              'User-Agent': data.agent,
-              'Referer': data.referer,
-              'Cookie': data.cookies
-            },
-            content: data.query,
-            onComplete: function(response){
-              var responseData = {
-                cookies: response.headers['Set-Cookie'],
-                type: response.headers['Content-Type'],
-                text: response.text,
-                reply_to: data.reply_to
-              };
-              var responseJson = JSON.stringify(responseData);
-              pageWorker.port.emit('response', responseJson);
-            }
-          });
           request.post();
+          break;
+        case 'PUT':
+          request.put();
+          break;
+        case 'DELETE':
+          request.delete();
+          break;
+        case 'HEAD':
+          request.head();
           break;
       }
     });
-    
   }
   else {
     pageWorker.destroy();
-    notification.notify({
-      title: "Websocket locally closed"
-    });
+    notification.notify({ title: "Websocket locally closed" });
   }
 }
