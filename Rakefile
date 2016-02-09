@@ -1,7 +1,5 @@
 task :start do
-  system('bundle exec thin -R config/config_http.ru -C config/thin_http.yml start')
-  system('bundle exec thin -R config/config_ws.ru -C config/thin_ws.yml start')
-  puts "Started"
+  system('bundle exec thin -R config/config_http.ru -C config/thin_http.yml start && bundle exec thin -R config/config_ws.ru -C config/thin_ws.yml start && echo "Servers started"')
 end
 
 task :stop do
@@ -11,8 +9,7 @@ task :stop do
   else
     servers.map do |server|
       pid = File.open("./#{server}") { |file| file.read }
-      system("kill #{pid}")
-      puts "Thin (pid #{pid}) stopped"
+      system("kill -9 #{pid} && echo 'Thin (pid #{pid}) stopped'")
     end
   end
 end
@@ -23,5 +20,5 @@ task :restart do
 end
 
 task :deploy do
- system 'mina stop && mina deploy && mina start'
+  system 'mina stop && mina deploy && mina start'
 end

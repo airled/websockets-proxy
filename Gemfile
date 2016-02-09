@@ -4,7 +4,10 @@ gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'sinatra-websocket'
 gem 'thin'
-gem 'curb'
-gem 'foreman'
 gem 'bunny'
-gem 'mina'
+
+group :development, :test do
+  gem 'mina'
+  gem 'curb'
+  gem 'foreman'
+end
