@@ -1,2 +1,2 @@
-require_relative '../ws'
+require_relative '../servers/ws'
 run Sinatra::Application

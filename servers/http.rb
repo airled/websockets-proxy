@@ -30,20 +30,20 @@ route :get, :post, :put, :delete, :head, '/*' do
   data_hash = get_data(request.env)
   answer = ''
 
-  conn = Bunny.new
-  conn.start
-  ch = conn.create_channel
-  q = ch.queue("", :exclusive => true, :auto_delete => true)
-  x = ch.default_exchange
+  connection = Bunny.new
+  connection.start
+  channel = connection.create_channel
+  queue_exclusive = channel.queue("", :exclusive => true, :auto_delete => true)
+  exchange = channel.default_exchange
 
-  x.publish(data_hash.merge(reply_to: q.name).to_json, :routing_key => 'request')
+  exchange.publish(data_hash.merge(reply_to: queue_exclusive.name).to_json, :routing_key => 'request')
   
-  q.subscribe(:block => true) do |delivery_info, metadata, payload|
+  queue_exclusive.subscribe(:block => true) do |delivery_info, metadata, payload|
     answer = JSON.parse(payload)
     delivery_info.consumer.cancel
   end
   
-  conn.close
+  connection.close
 
   content_type answer['type']
   response.set_cookie(answer['cookies'].split('=')[0], :value => answer['cookies'].split('=')[1]) if answer['cookies']

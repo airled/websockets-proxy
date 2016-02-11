@@ -1,2 +1,2 @@
-require_relative '../http'
+require_relative '../servers/http'
 run Sinatra::Application
