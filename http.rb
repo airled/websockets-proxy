@@ -4,7 +4,6 @@ require "bunny"
 require 'json'
 
 set :server, 'thin'
-set :bind, '0.0.0.0'
 set :port, 3100
 
 def get_data(request_env)
@@ -15,12 +14,21 @@ def get_data(request_env)
   cookies = request_env['HTTP_COOKIE']
   agent = request_env['HTTP_USER_AGENT']
   referer = request_env['HTTP_REFERER']
-  url = "http://#{host}#{resource}"
-  {url: url, method: method, query: query, cookies: cookies, agent: agent, referer: referer}
+  url = host.include?(' ') ? host.split(' ')[1] : "http://#{host}#{resource}"
+  {
+    url: url,
+    method: method,
+    query: query,
+    cookies: cookies,
+    agent: agent,
+    referer: referer
+  }
 end
 
 route :get, :post, :put, :delete, :head, '/*' do
+  
   data_hash = get_data(request.env)
+  answer = ''
 
   conn = Bunny.new
   conn.start
@@ -30,8 +38,6 @@ route :get, :post, :put, :delete, :head, '/*' do
 
   x.publish(data_hash.merge(reply_to: q.name).to_json, :routing_key => 'request')
   
-  answer = ''
-
   q.subscribe(:block => true) do |delivery_info, metadata, payload|
     answer = JSON.parse(payload)
     delivery_info.consumer.cancel

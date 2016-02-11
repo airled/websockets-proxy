@@ -22,3 +22,10 @@ end
 task :deploy do
   system 'mina stop && mina deploy && mina start'
 end
+
+task :plugin do
+  system 'cd ./plugin && jpm run -b /usr/bin/firefox'
+end
+
+task :p => :plugin do
+end

@@ -5,9 +5,9 @@ gem 'sinatra-contrib'
 gem 'sinatra-websocket'
 gem 'thin'
 gem 'bunny'
+gem 'foreman'
 
 group :development, :test do
   gem 'mina'
   gem 'curb'
-  gem 'foreman'
 end

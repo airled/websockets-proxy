@@ -32,11 +32,8 @@ function handleButton(state) {
       button.state('window', {checked: false});
     });
     
-    /////////////////REQUEST HANDLER/////////////////
-    
     pageWorker.port.on('request', function(request) {
       var data = JSON.parse(request);
-      // data = {url, method, query, cookies, agent, referer, reply_to} of request
       var request = require("sdk/request").Request({
         url: data.url,
         headers: {
