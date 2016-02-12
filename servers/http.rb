@@ -33,7 +33,7 @@ route :get, :post, :put, :delete, :head, '/*' do
   connection = Bunny.new
   connection.start
   channel = connection.create_channel
-  queue_exclusive = channel.queue("", :exclusive => true, :auto_delete => true)
+  queue_exclusive = channel.queue("", :exclusive => true)
   exchange = channel.default_exchange
 
   exchange.publish(data_hash.merge(reply_to: queue_exclusive.name).to_json, :routing_key => 'request')

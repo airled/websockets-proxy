@@ -24,7 +24,7 @@ task :deploy do
 end
 
 task :plugin do
-  system 'cd ./plugin && jpm run -b /usr/bin/firefox'
+  system 'cd ./firefox-plugin && jpm run -b /usr/bin/firefox'
 end
 
 task :p => :plugin do

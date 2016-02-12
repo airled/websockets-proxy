@@ -4,31 +4,33 @@ require "bunny"
 require 'json'
 
 set :server, 'thin'
-set :bind, '0.0.0.0'
 set :port, 3101
 
 get '/' do
   request.websocket do |ws|
+
     ws.onopen do
       puts 'Websocket opened'
     end
-    ws.onclose do
-      puts 'Websocket closed'
-    end
 
-    conn = Bunny.new
-    conn.start
-    ch = conn.create_channel
-    q = ch.queue("request", :auto_delete => true)
-    x = ch.default_exchange
+    connection = Bunny.new
+    connection.start
+    channel = connection.create_channel
+    queue = channel.queue("request")
+    exchange = channel.default_exchange
 
-    q.subscribe do |delivery_info, metadata, payload|
+    queue.subscribe do |delivery_info, metadata, payload|
       ws.send(payload)
     end
 
     ws.onmessage do |response|
       reply_to = JSON.parse(response)['reply_to']
-      x.publish(response, :routing_key => reply_to)
+      exchange.publish(response, :routing_key => reply_to)
+    end
+
+    ws.onclose do
+      puts 'Websocket closed'
+      connection.close
     end
 
   end #websocket

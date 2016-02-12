@@ -1,3 +1,2 @@
-http-proxy: bundle exec ruby ./servers/http.rb
-websocket-proxy: bundle exec ruby ./servers/ws.rb
-
+http-server: bundle exec ruby ./servers/http.rb
+websocket-server: bundle exec ruby ./servers/ws.rb
