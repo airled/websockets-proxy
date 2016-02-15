@@ -45,7 +45,7 @@ route :get, :post, :put, :delete, :head, '/*' do
   
   connection.close
 
-  content_type answer['type']
+  content_type answer['type'].split(';')[0]
   response.set_cookie(answer['cookies'].split('=')[0], :value => answer['cookies'].split('=')[1]) if answer['cookies']
   answer['text']
 
