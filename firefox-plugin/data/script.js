@@ -10,7 +10,7 @@ self.port.on('sourceAddress', function(address) {
     self.port.emit('closeItLocally','')
   };
   ws.onmessage = function(request) {
-    self.port.emit('notificate', request.data);
+    // self.port.emit('notificate', request.data);
     self.port.emit('request', request.data);
   };
 
