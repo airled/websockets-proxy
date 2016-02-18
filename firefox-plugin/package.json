@@ -18,6 +18,6 @@
     "title": "Websocket server address",
     "description": "Websocket server address",
     "type": "string",
-    "value": "ws://51.254.10.211:8081"
+    "value": "ws://localhost:3101"
   }]
 }

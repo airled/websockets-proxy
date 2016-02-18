@@ -36,7 +36,7 @@ route :get, :post, :put, :delete, :head, '/*' do
   queue_exclusive = channel.queue("", :exclusive => true)
   exchange = channel.default_exchange
 
-  exchange.publish(data_hash.merge(reply_to: queue_exclusive.name).to_json, :routing_key => 'request')
+  exchange.publish(data_hash.merge(reply_to: queue_exclusive.name).to_json, :routing_key => '123')
   
   queue_exclusive.subscribe(:block => true) do |delivery_info, metadata, payload|
     answer = JSON.parse(payload)
