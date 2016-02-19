@@ -15,8 +15,8 @@ self.port.on('sourceAddress', function(address) {
     if (request.data == 'login') {
       self.port.emit('notificate', 'Got login-message. Sending auth data...');
       var init_message = {
-        'login': 'testlogin',
-        'password': 'testpassword'
+        'email': 'test@test.test',
+        'password': '1234567890'
       };
       ws.send(JSON.stringify(init_message));
     }

@@ -2,21 +2,23 @@ require 'sinatra'
 require 'sinatra-websocket'
 require "bunny"
 require 'json'
+require 'bcrypt'
+require_relative '../account_model'
 
 set :server, 'thin'
 set :port, 3101
 
 def authenticate(hash)
-  if hash['login'] == 'testlogin' && hash['password'] == 'testpassword'
-    true
-  else
+  account = Account[email: hash['email']]
+  if account.nil?
     false
+  else
+    ::BCrypt::Password.new(account.crypted_password) == hash['password'] ? account : false
   end
 end
 
 get '/' do
-
-  not_authenticated = true
+  authenticated = false
   queue_name = ''
 
   request.websocket do |ws|
@@ -32,12 +34,15 @@ get '/' do
     exchange = channel.default_exchange
 
     ws.onmessage do |response|
-      if not_authenticated
-        init = JSON.parse(response)
-        if init.has_key?('login') && init.has_key?('password') && authenticate(init)
+      if !authenticated
+        init_message = JSON.parse(response)
+        if init_message.has_key?('email') && init_message.has_key?('password') && authenticate(init_message)
           ws.send('auth_ok')
-          queue_name = '123'
-          not_authenticated = false
+          account = authenticate(init_message)
+          queue_name = account.queue
+          port = account.port
+          p "Queue '#{queue_name}' is bound up with port '#{port}'"
+          authenticated = true
           queue = channel.queue(queue_name)
 
           queue.subscribe do |delivery_info, metadata, payload|

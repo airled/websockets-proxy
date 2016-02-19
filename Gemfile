@@ -6,6 +6,9 @@ gem 'sinatra-websocket'
 gem 'thin'
 gem 'bunny'
 gem 'foreman'
+gem 'sequel'
+gem 'mysql2'
+gem 'bcrypt'
 
 group :development, :test do
   gem 'mina'

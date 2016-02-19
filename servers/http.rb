@@ -2,9 +2,10 @@ require 'sinatra'
 require "sinatra/multi_route"
 require "bunny"
 require 'json'
+require_relative '../account_model'
 
 set :server, 'thin'
-set :port, 3100
+set :port, 3102
 
 def get_data(request_env)
   host = request_env['HTTP_HOST']
@@ -26,7 +27,7 @@ def get_data(request_env)
 end
 
 route :get, :post, :put, :delete, :head, '/*' do
-  
+  personal_port = request.env['HTTP_PERSONALPORT']
   data_hash = get_data(request.env)
   answer = ''
 
@@ -35,8 +36,9 @@ route :get, :post, :put, :delete, :head, '/*' do
   channel = connection.create_channel
   queue_exclusive = channel.queue("", :exclusive => true)
   exchange = channel.default_exchange
+  routing_key = Account[port: personal_port].queue
 
-  exchange.publish(data_hash.merge(reply_to: queue_exclusive.name).to_json, :routing_key => '123')
+  exchange.publish(data_hash.merge(reply_to: queue_exclusive.name).to_json, :routing_key => routing_key)
   
   queue_exclusive.subscribe(:block => true) do |delivery_info, metadata, payload|
     answer = JSON.parse(payload)
