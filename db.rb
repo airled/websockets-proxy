@@ -5,5 +5,5 @@ DB = Sequel.connect(
   adapter: 'mysql2',
   host: 'localhost',
   user: 'root',
-  database: 'ws_development'
+  database: 'ws_production'
 )
