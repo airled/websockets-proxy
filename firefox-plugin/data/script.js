@@ -11,12 +11,11 @@ self.port.on('init', function(init_params) {
 
   ws.onclose = function() {
     self.port.emit('notificate', 'Websocket remotelly closed');
-    self.port.emit('closeItLocally','')
+    self.port.emit('closeItLocally', '');
   };
 
   ws.onmessage = function(request) {
     if (request.data == 'login') {
-      self.port.emit('notificate', 'Got login-message. Sending auth data...');
       var init_message = {
         'email': email,
         'password': password
