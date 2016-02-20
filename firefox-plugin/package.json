@@ -13,11 +13,27 @@
   "keywords": [
     "jetpack"
   ],
-  "preferences": [{
-    "name": "Websocket server address",
-    "title": "Websocket server address",
-    "description": "Websocket server address",
-    "type": "string",
-    "value": "ws://localhost:3101"
-  }]
+  "preferences": [
+    {
+      "name": "Websocket server address",
+      "title": "Websocket server address",
+      "description": "Websocket server address",
+      "type": "string",
+      "value": "ws://localhost:3101"
+    },
+    {
+      "name": "E-mail",
+      "title": "E-mail",
+      "description": "E-mail",
+      "type": "string",
+      "value": "test@test.test"
+    },
+    {
+      "name": "Password",
+      "title": "Password",
+      "description": "Password",
+      "type": "string",
+      "value": "1234567890"
+    }
+  ]
 }

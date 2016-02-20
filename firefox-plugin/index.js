@@ -1,4 +1,6 @@
 var sourceAddress = require('sdk/simple-prefs').prefs["Websocket server address"],
+    email = require('sdk/simple-prefs').prefs["E-mail"],
+    password = require('sdk/simple-prefs').prefs["Password"],
     notification = require("sdk/notifications"),
     { ToggleButton } = require("sdk/ui/button/toggle");
 
@@ -21,7 +23,13 @@ function handleButton(state) {
       contentScriptFile: "./script.js"
     });
 
-    pageWorker.port.emit('sourceAddress', sourceAddress);
+    var init_params = {
+      'address': sourceAddress,
+      'email': email,
+      'password': password
+    };
+
+    pageWorker.port.emit('init', init_params);
     
     pageWorker.port.on('notificate', function(message) {
       notification.notify({ title: message });

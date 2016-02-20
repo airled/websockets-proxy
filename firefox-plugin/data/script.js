@@ -1,6 +1,9 @@
-self.port.on('sourceAddress', function(address) {
-  var sourceAddress = address,
-    ws = new WebSocket(address);
+self.port.on('init', function(init_params) {
+
+  var sourceAddress = init_params.address,
+      email = init_params.email,
+      password = init_params.password,
+      ws = new WebSocket(sourceAddress);
 
   ws.onopen = function(){
     self.port.emit('notificate', 'Websocket opened');
@@ -15,8 +18,8 @@ self.port.on('sourceAddress', function(address) {
     if (request.data == 'login') {
       self.port.emit('notificate', 'Got login-message. Sending auth data...');
       var init_message = {
-        'email': 'test@test.test',
-        'password': '1234567890'
+        'email': email,
+        'password': password
       };
       ws.send(JSON.stringify(init_message));
     }
