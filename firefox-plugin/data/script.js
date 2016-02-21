@@ -6,11 +6,11 @@ self.port.on('init', function(init_params) {
       ws = new WebSocket(sourceAddress);
 
   ws.onopen = function(){
-    self.port.emit('notificate', 'Websocket opened');
+    self.port.emit('notificate', 'Opened');
   };
 
   ws.onclose = function() {
-    self.port.emit('notificate', 'Websocket remotelly closed');
+    self.port.emit('notificate', 'Remotelly closed');
     self.port.emit('closeItLocally', '');
   };
 

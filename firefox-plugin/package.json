@@ -15,25 +15,22 @@
   ],
   "preferences": [
     {
-      "name": "Websocket server address",
-      "title": "Websocket server address",
-      "description": "Websocket server address",
+      "name": "Address",
+      "title": "Address",
       "type": "string",
-      "value": "ws://localhost:3101"
+      "value": "ws://51.254.10.211:8081"
     },
     {
       "name": "E-mail",
       "title": "E-mail",
-      "description": "E-mail",
       "type": "string",
-      "value": "test@test.test"
+      "value": ""
     },
     {
       "name": "Password",
       "title": "Password",
-      "description": "Password",
       "type": "string",
-      "value": "1234567890"
+      "value": ""
     }
   ]
 }

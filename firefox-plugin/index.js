@@ -1,4 +1,4 @@
-var sourceAddress = require('sdk/simple-prefs').prefs["Websocket server address"],
+var address = require('sdk/simple-prefs').prefs["Address"],
     email = require('sdk/simple-prefs').prefs["E-mail"],
     password = require('sdk/simple-prefs').prefs["Password"],
     notification = require("sdk/notifications"),
@@ -17,14 +17,17 @@ var button = ToggleButton({
 
 function handleButton(state) {
   if (state.checked) {
-    notification.notify({ title: "Got source address: " + sourceAddress });
+    notification.notify({
+      title: 'Websocket',
+      text: "Got source address: " + address
+    });
 
     pageWorker = require("sdk/page-worker").Page({
       contentScriptFile: "./script.js"
     });
 
     var init_params = {
-      'address': sourceAddress,
+      'address': address,
       'email': email,
       'password': password
     };
@@ -32,7 +35,10 @@ function handleButton(state) {
     pageWorker.port.emit('init', init_params);
     
     pageWorker.port.on('notificate', function(message) {
-      notification.notify({ title: message });
+      notification.notify({
+        title: 'Websocket',
+        text: message
+      });
     });
 
     pageWorker.port.on('closeItLocally', function(message) {
@@ -82,6 +88,9 @@ function handleButton(state) {
   }
   else {
     pageWorker.destroy();
-    notification.notify({ title: "Websocket locally closed" });
+    notification.notify({
+      title: 'Websocket',
+      text: "Locally closed"
+    });
   }
 }
