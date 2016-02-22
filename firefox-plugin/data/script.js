@@ -1,17 +1,17 @@
 self.port.on('init', function(init_params) {
 
-  var sourceAddress = init_params.address,
+  var address = init_params.address,
       email = init_params.email,
       password = init_params.password,
-      ws = new WebSocket(sourceAddress);
+      ws = new WebSocket(address);
 
   ws.onopen = function(){
     self.port.emit('notificate', 'Opened');
   };
 
   ws.onclose = function() {
-    self.port.emit('notificate', 'Remotelly closed');
-    self.port.emit('closeItLocally', '');
+    self.port.emit('notificate', "Remotelly closed\nReconnection in 10 sec");
+    setTimeout("self.port.emit('Reconnect', '');", 10000)
   };
 
   ws.onmessage = function(request) {

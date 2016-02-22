@@ -17,10 +17,6 @@ var button = ToggleButton({
 
 function handleButton(state) {
   if (state.checked) {
-    notification.notify({
-      title: 'Websocket',
-      text: "Got source address: " + address
-    });
 
     pageWorker = require("sdk/page-worker").Page({
       contentScriptFile: "./script.js"
@@ -41,9 +37,8 @@ function handleButton(state) {
       });
     });
 
-    pageWorker.port.on('closeItLocally', function(message) {
-      pageWorker.destroy();
-      button.state('window', {checked: false});
+    pageWorker.port.on('Reconnect', function(message) {
+      pageWorker.port.emit('init', init_params);
     });
     
     pageWorker.port.on('request', function(request) {
