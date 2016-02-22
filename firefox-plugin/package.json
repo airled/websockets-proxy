@@ -18,7 +18,7 @@
       "name": "Address",
       "title": "Address",
       "type": "string",
-      "value": "ws://51.254.10.211:8081"
+      "value": "ws://51.254.10.211:8080"
     },
     {
       "name": "E-mail",

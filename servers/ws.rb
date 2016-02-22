@@ -20,6 +20,7 @@ end
 get '/' do
   authenticated = false
   queue_name = ''
+  account = ''
 
   request.websocket do |ws|
 
@@ -43,6 +44,7 @@ get '/' do
           port = account.port
           p "Queue '#{queue_name}' is bound up with port '#{port}'"
           authenticated = true
+          account.update(active: true)
           queue = channel.queue(queue_name)
 
           queue.subscribe do |delivery_info, metadata, payload|
@@ -61,6 +63,7 @@ get '/' do
     ws.onclose do
       puts 'Websocket closed'
       connection.close
+      account.update(active: false)
     end
 
   end #websocket
