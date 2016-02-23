@@ -29,3 +29,7 @@ end
 
 task :p => :plugin do
 end
+
+task :prod do
+  system 'RACK_ENV=production foreman start'
+end
