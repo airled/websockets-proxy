@@ -8,24 +8,19 @@ require_relative '../account_model'
 set :server, 'thin'
 set :port, 3102
 
-redis = Redis.new
+redis = Redis.new(db: '15')
 
 def get_data(request_env)
   host = request_env['HTTP_HOST']
   resource = request_env['REQUEST_URI']
-  method = request_env['REQUEST_METHOD']
-  query = request_env['rack.request.form_vars']
-  cookies = request_env['HTTP_COOKIE']
-  agent = request_env['HTTP_USER_AGENT']
-  referer = request_env['HTTP_REFERER']
   url = host.include?(' ') ? host.split(' ')[1] : "http://#{host}#{resource}"
   {
     url: url,
-    method: method,
-    query: query,
-    cookies: cookies,
-    agent: agent,
-    referer: referer
+    method: request_env['REQUEST_METHOD'],
+    query: request_env['rack.request.form_vars'],
+    cookies: request_env['HTTP_COOKIE'],
+    agent: request_env['HTTP_USER_AGENT'],
+    referer: request_env['HTTP_REFERER']
   }
 end
 
@@ -40,8 +35,8 @@ route :get, :post, :put, :delete, :head, '/*' do
     connection = Bunny.new
     connection.start
     channel = connection.create_channel
-    queue_exclusive = channel.queue("", :exclusive => true)
     exchange = channel.default_exchange
+    queue_exclusive = channel.queue("", :exclusive => true)
     routing_key = Account[port: personal_port].queue
 
     exchange.publish(data_hash.merge(reply_to: queue_exclusive.name).to_json, :routing_key => routing_key)

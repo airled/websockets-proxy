@@ -2,30 +2,42 @@ require 'sinatra'
 require 'sinatra-websocket'
 require "bunny"
 require 'json'
-require 'bcrypt'
 require 'redis'
 require_relative '../account_model'
 
 set :server, 'thin'
 set :port, 3101
 
-redis = Redis.new
-redis.flushall
+redis = Redis.new(db: '15')
+redis.flushdb
 
-def authenticate(hash)
-  account = Account[email: hash['email']]
-  if account.nil?
-    false
+def valid?(init_message)
+  init_message.has_key?('email') && init_message.has_key?('password')
+end
+
+def authenticate(init_message)
+  account = Account[email: init_message['email']]
+  if !account.nil? && account.has_password?(init_message['password']) && account.confirmed?
+    account
   else
-    ::BCrypt::Password.new(account.crypted_password) == hash['password'] ? account : false
+    false
   end
 end
 
-get '/' do
-  authenticated = false
-  account = nil
+def activate(account, redis)
+  redis.set(account.port, account.queue)
+  account.update(active: true)
+end
 
+def deactivate(account, redis)
+  redis.del(account.port)
+  account.update(active: false)
+end
+
+get '/' do
   request.websocket do |ws|
+    authenticated = false
+    account = nil
 
     ws.onopen do
       puts 'Websocket opened'
@@ -40,15 +52,14 @@ get '/' do
     ws.onmessage do |response|
       if !authenticated
         init_message = JSON.parse(response)
-        if init_message.has_key?('email') && init_message.has_key?('password') && authenticate(init_message)
+        if valid?(init_message) && authenticate(init_message)
           ws.send('auth_ok')
           account = authenticate(init_message)
           p "Queue '#{account.queue}' is bound up with port '#{account.port}'"
           authenticated = true
-          redis.set(account.port, account.queue)
-          account.update(active: true)
-          queue = channel.queue(account.queue)
+          activate(account, redis)
 
+          queue = channel.queue(account.queue)
           queue.subscribe do |delivery_info, metadata, payload|
             ws.send(payload)
           end
@@ -65,7 +76,7 @@ get '/' do
     ws.onclose do
       puts 'Websocket closed'
       connection.close
-      account.update(active: false) && redis.del(account.port) if account
+      deactivate(account, redis) if account
     end
 
   end #websocket
