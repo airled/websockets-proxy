@@ -2,10 +2,13 @@ require 'sinatra'
 require "sinatra/multi_route"
 require "bunny"
 require 'json'
+require 'redis'
 require_relative '../account_model'
 
 set :server, 'thin'
 set :port, 3102
+
+redis = Redis.new
 
 def get_data(request_env)
   host = request_env['HTTP_HOST']
@@ -28,27 +31,31 @@ end
 
 route :get, :post, :put, :delete, :head, '/*' do
   personal_port = request.env['HTTP_PERSONALPORT']
-  data_hash = get_data(request.env)
-  answer = ''
+  if redis.get(personal_port).nil?
+    body 'No websocket for this port'
+  else
+    data_hash = get_data(request.env)
+    answer = ''
 
-  connection = Bunny.new
-  connection.start
-  channel = connection.create_channel
-  queue_exclusive = channel.queue("", :exclusive => true)
-  exchange = channel.default_exchange
-  routing_key = Account[port: personal_port].queue
+    connection = Bunny.new
+    connection.start
+    channel = connection.create_channel
+    queue_exclusive = channel.queue("", :exclusive => true)
+    exchange = channel.default_exchange
+    routing_key = Account[port: personal_port].queue
 
-  exchange.publish(data_hash.merge(reply_to: queue_exclusive.name).to_json, :routing_key => routing_key)
-  
-  queue_exclusive.subscribe(:block => true) do |delivery_info, metadata, payload|
-    answer = JSON.parse(payload)
-    delivery_info.consumer.cancel
+    exchange.publish(data_hash.merge(reply_to: queue_exclusive.name).to_json, :routing_key => routing_key)
+    
+    queue_exclusive.subscribe(:block => true) do |delivery_info, metadata, payload|
+      answer = JSON.parse(payload)
+      delivery_info.consumer.cancel
+    end
+    
+    connection.close
+
+    content_type answer['type'].split(';')[0]
+    response.set_cookie(answer['cookies'].split('=')[0], :value => answer['cookies'].split('=')[1]) if answer['cookies']
+    answer['text']
   end
-  
-  connection.close
-
-  content_type answer['type'].split(';')[0]
-  response.set_cookie(answer['cookies'].split('=')[0], :value => answer['cookies'].split('=')[1]) if answer['cookies']
-  answer['text']
 
 end

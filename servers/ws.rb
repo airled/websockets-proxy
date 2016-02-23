@@ -3,10 +3,14 @@ require 'sinatra-websocket'
 require "bunny"
 require 'json'
 require 'bcrypt'
+require 'redis'
 require_relative '../account_model'
 
 set :server, 'thin'
 set :port, 3101
+
+redis = Redis.new
+redis.flushall
 
 def authenticate(hash)
   account = Account[email: hash['email']]
@@ -19,8 +23,7 @@ end
 
 get '/' do
   authenticated = false
-  queue_name = ''
-  account = ''
+  account = nil
 
   request.websocket do |ws|
 
@@ -40,12 +43,11 @@ get '/' do
         if init_message.has_key?('email') && init_message.has_key?('password') && authenticate(init_message)
           ws.send('auth_ok')
           account = authenticate(init_message)
-          queue_name = account.queue
-          port = account.port
-          p "Queue '#{queue_name}' is bound up with port '#{port}'"
+          p "Queue '#{account.queue}' is bound up with port '#{account.port}'"
           authenticated = true
+          redis.set(account.port, account.queue)
           account.update(active: true)
-          queue = channel.queue(queue_name)
+          queue = channel.queue(account.queue)
 
           queue.subscribe do |delivery_info, metadata, payload|
             ws.send(payload)
@@ -63,7 +65,7 @@ get '/' do
     ws.onclose do
       puts 'Websocket closed'
       connection.close
-      account.update(active: false)
+      account.update(active: false) && redis.del(account.port) if account
     end
 
   end #websocket

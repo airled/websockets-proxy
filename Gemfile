@@ -9,6 +9,7 @@ gem 'foreman'
 gem 'sequel'
 gem 'mysql2'
 gem 'bcrypt'
+gem 'redis'
 
 group :development, :test do
   gem 'mina'
