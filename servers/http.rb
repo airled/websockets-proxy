@@ -10,7 +10,7 @@ set :port, 3102
 
 redis = Redis.new(db: '15')
 
-def get_data(request_env)
+def get_request_data(request_env)
   host = request_env['HTTP_HOST']
   resource = request_env['REQUEST_URI']
   url = host.include?(' ') ? host.split(' ')[1] : "http://#{host}#{resource}"
@@ -24,12 +24,20 @@ def get_data(request_env)
   }
 end
 
+def add_cookies_to_response(cookies, response)
+  cookies.split("\n").map do |cookie|
+    part = cookie.split('=')
+    response.set_cookie(part[0], :value => part[1])
+  end
+end
+
 route :get, :post, :put, :delete, :head, '/*' do
   personal_port = request.env['HTTP_PERSONALPORT']
   if redis.get(personal_port).nil?
+    status 404
     body 'No websocket for this port'
   else
-    data_hash = get_data(request.env)
+    data_hash = get_request_data(request.env)
     answer = ''
 
     connection = Bunny.new
@@ -49,8 +57,9 @@ route :get, :post, :put, :delete, :head, '/*' do
     connection.close
 
     content_type answer['type'].split(';')[0]
-    response.set_cookie(answer['cookies'].split('=')[0], :value => answer['cookies'].split('=')[1]) if answer['cookies']
+    add_cookies_to_response(answer['cookies'], response) if answer['cookies']
     answer['text']
+
   end
 
 end
