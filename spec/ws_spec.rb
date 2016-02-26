@@ -3,32 +3,32 @@ require File.expand_path '../../servers/ws.rb', __FILE__
 
 describe "Websocket server" do
 
-  it "empty init message should not be valid" do
+  it "does not validate empty init message" do
     init_message = {}
     expect(valid?(init_message)).to eql(false)
   end
 
-  it "init message without email should not be valid" do
+  it "does not validate init message without email" do
     init_message = {'password' => '123'}
     expect(valid?(init_message)).to eql(false)
   end
 
-  it "init message without password should not be valid" do
+  it "does not validate init message without password" do
     init_message = {'email' => '1234'}
     expect(valid?(init_message)).to eql(false)
   end
 
-  it "init message with email and password should be valid" do
+  it "validates init message with email and password" do
     init_message = {'email' => 'a@a.a', 'password' => '1234'}
     expect(valid?(init_message)).to eql(true)
   end
 
-  it "init message should not be authenticated if account is nil" do
+  it "does not authenticate user if account is nil" do
     init_message = {'email' => 'a@a.a', 'password' => '1234'}
     expect(authenticate(init_message)).to eql(false)
   end
 
-  it "init message should not be authenticated if account is not confirmed" do
+  it "does not authenticate user if account is not confirmed" do
     account = Account.create(
       :email => 'abc@abc.abc',
       :crypted_password => ::BCrypt::Password.create('1234567890'),
@@ -43,7 +43,7 @@ describe "Websocket server" do
     account.destroy
   end
 
-  it "init message should not be authenticated if password is not correct" do
+  it "does not authenticate user if password is not correct" do
     account = Account.create(
       :email => 'abc@abc.abc',
       :crypted_password => ::BCrypt::Password.create('1234567890'),
@@ -58,7 +58,7 @@ describe "Websocket server" do
     account.destroy
   end
 
-  it "init message should be authenticated if account is confirmed" do
+  it "authenticates user if account is confirmed" do
     account = Account.create(
       :email => 'abc@abc.abc',
       :crypted_password => ::BCrypt::Password.create('1234567890'),
@@ -73,7 +73,7 @@ describe "Websocket server" do
     account.destroy
   end
 
-  it "not activated account could be activated" do
+  it "activates account" do
     account = Account.create(
       :email => 'abc@abc.abc',
       :crypted_password => ::BCrypt::Password.create('1234567890'),
@@ -91,7 +91,7 @@ describe "Websocket server" do
     PORTLIST.flushdb
   end
 
-  it "activated account could be deactivated" do
+  it "deactivates account" do
     account = Account.create(
       :email => 'abc@abc.abc',
       :crypted_password => ::BCrypt::Password.create('1234567890'),
