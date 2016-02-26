@@ -8,8 +8,8 @@ require_relative '../account_model'
 set :server, 'thin'
 set :port, 3101
 
-redis = Redis.new(db: '15')
-redis.flushdb
+PORTLIST = Redis.new(db: '15')
+PORTLIST.flushdb
 
 def valid?(init_message)
   init_message.has_key?('email') && init_message.has_key?('password')
@@ -24,13 +24,13 @@ def authenticate(init_message)
   end
 end
 
-def activate(account, redis)
-  redis.set(account.port, account.queue)
+def activate(account)
+  PORTLIST.set(account.port, account.queue)
   account.update(active: true)
 end
 
-def deactivate(account, redis)
-  redis.del(account.port)
+def deactivate(account)
+  PORTLIST.del(account.port)
   account.update(active: false)
 end
 
@@ -57,7 +57,7 @@ get '/' do
           account = authenticate(init_message)
           p "Queue '#{account.queue}' is bound up with port '#{account.port}'"
           authenticated = true
-          activate(account, redis)
+          activate(account)
 
           queue = channel.queue(account.queue)
           queue.subscribe do |delivery_info, metadata, payload|
@@ -76,7 +76,7 @@ get '/' do
     ws.onclose do
       puts 'Websocket closed'
       connection.close
-      deactivate(account, redis) if account
+      deactivate(account) if account
     end
 
   end #websocket

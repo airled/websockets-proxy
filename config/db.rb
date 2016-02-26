@@ -9,6 +9,8 @@ database =
     'ws_development'
   when 'production'
     'ws_production'
+  when 'test'
+    'ws_test'
   end
 
 DB = Sequel.connect(

@@ -12,6 +12,10 @@ gem 'bcrypt'
 gem 'redis'
 
 group :development, :test do
+  gem 'pry'
+  gem 'rspec'
   gem 'mina'
   gem 'curb'
 end
+
+gem "codeclimate-test-reporter", group: :test, require: nil

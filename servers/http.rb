@@ -8,7 +8,7 @@ require_relative '../account_model'
 set :server, 'thin'
 set :port, 3102
 
-PORT_LIST = Redis.new(db: '15')
+PORTLIST = Redis.new(db: '15')
 
 def get_request_data(request_env)
   host = request_env['HTTP_HOST']
@@ -32,10 +32,11 @@ def add_cookies_to_response(cookies, response)
 end
 
 def port_is_not_active?(port)
-  PORT_LIST.get(port).nil?
+  PORTLIST.get(port).nil?
 end
 
 route :get, :post, :put, :delete, :head, '/*' do
+  
   personal_port = request.env['HTTP_PERSONALPORT']
   if port_is_not_active?(personal_port)
     status 404
@@ -63,7 +64,6 @@ route :get, :post, :put, :delete, :head, '/*' do
     content_type answer['type'].split(';')[0]
     add_cookies_to_response(answer['cookies'], response) if answer['cookies']
     answer['text']
-
   end
 
 end
