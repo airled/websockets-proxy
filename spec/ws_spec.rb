@@ -2,6 +2,7 @@ require File.expand_path '../spec_helper.rb', __FILE__
 require File.expand_path '../../servers/ws.rb', __FILE__
 
 describe "Websocket server" do
+  PORTLIST = Redis.new(db: '14')
 
   it "does not validate empty init message" do
     init_message = {}
@@ -83,7 +84,6 @@ describe "Websocket server" do
       :queue => '111',
       :port => 234567
     )
-    PORTLIST = Redis.new(db: '14')
     activate(account)
     expect(account.active).to eql(true)
     expect(PORTLIST.keys.include?(account.port.to_s)).to eql(true)
@@ -101,7 +101,6 @@ describe "Websocket server" do
       :queue => '111',
       :port => 234567
     )
-    PORTLIST = Redis.new(db: '14')
     PORTLIST.set(account.port, account.queue)
     deactivate(account)
     expect(account.active).to eql(false)
