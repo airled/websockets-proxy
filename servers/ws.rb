@@ -52,9 +52,8 @@ get '/' do
     ws.onmessage do |response|
       if !authenticated
         init_message = JSON.parse(response)
-        if valid?(init_message) && authenticate(init_message)
+        if valid?(init_message) && account = authenticate(init_message)
           ws.send('auth_ok')
-          account = authenticate(init_message)
           p "Queue '#{account.queue}' is bound up with port '#{account.port}'"
           authenticated = true
           activate(account)

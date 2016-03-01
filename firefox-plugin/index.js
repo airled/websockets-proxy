@@ -51,6 +51,7 @@ function handleButton(state) {
           'Cookie': data.cookies
         },
         content: data.query,
+        anonymous: true,
         onComplete: function(response) {
           var responseData = {
             cookies: response.headers['Set-Cookie'],
