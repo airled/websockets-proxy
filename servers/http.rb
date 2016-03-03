@@ -24,13 +24,6 @@ def get_request_data(request_env)
   }
 end
 
-def add_cookies_to_response(cookies, response)
-  cookies.split("\n").map do |cookie|
-    part = cookie.split('=')
-    response.set_cookie(part[0], :value => part[1])
-  end
-end
-
 def port_is_not_active?(port)
   PORTLIST.get(port).nil?
 end
@@ -62,7 +55,7 @@ route :get, :post, :put, :delete, :head, '/*' do
     connection.close
 
     content_type answer['type'].split(';')[0]
-    add_cookies_to_response(answer['cookies'], response) if answer['cookies']
+    response.headers['Set-Cookie'] = answer['cookies'] if answer['cookies']
     answer['text']
   end
 

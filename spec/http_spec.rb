@@ -16,14 +16,6 @@ describe "HTTP server" do
     expect(get_request_data(request_env)[:url]).to eql('http://1.1.1.1:1111/test')
   end
 
-  it "should add cookies to response" do
-    cookies = "test1=test2\ntest3=test4"
-    get '/'
-    add_cookies_to_response(cookies, last_response)
-    expect(last_response['Set-Cookie']).to include("test1=test2")
-    expect(last_response['Set-Cookie']).to include("test3=test4")
-  end
-
   it "should find activated port in port list" do
     PORTLIST.set('1234', 'test')
     expect(port_is_not_active?('1234')).to eql(false)
