@@ -62,7 +62,7 @@ describe "Websocket server" do
   end
 
   after(:all) do
-    @accout_confirmed.destroy
+    @account_confirmed.destroy
     @account_not_confirmed.destroy
   end
 
