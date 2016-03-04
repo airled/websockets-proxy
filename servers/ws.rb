@@ -24,16 +24,6 @@ def authenticate(init_message)
   end
 end
 
-def activate(account)
-  PORTLIST.set(account.port, account.queue)
-  account.update(active: true)
-end
-
-def deactivate(account)
-  PORTLIST.del(account.port)
-  account.update(active: false)
-end
-
 get '/' do
   request.websocket do |ws|
     authenticated = false
@@ -56,7 +46,8 @@ get '/' do
           ws.send('auth_ok')
           p "Queue '#{account.queue}' is bound up with port '#{account.port}'"
           authenticated = true
-          activate(account)
+          PORTLIST.set(account.port, account.queue)
+          account.activate
 
           queue = channel.queue(account.queue)
           queue.subscribe do |delivery_info, metadata, payload|
@@ -75,7 +66,7 @@ get '/' do
     ws.onclose do
       puts 'Websocket closed'
       connection.close
-      deactivate(account) if account
+      PORTLIST.del(account.port) && account.deactivate if account
     end
 
   end #websocket

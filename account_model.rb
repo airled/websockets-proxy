@@ -10,5 +10,13 @@ class Account < Sequel::Model
   def has_password?(password)
     ::BCrypt::Password.new(self.crypted_password) == password
   end
+
+  def activate
+    self.update(active: true)
+  end
+
+  def deactivate
+    self.update(active: false)
+  end
   
 end
