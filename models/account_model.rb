@@ -1,4 +1,4 @@
-require_relative './config/db'
+require_relative '../config/db'
 require 'bcrypt'
 
 class Account < Sequel::Model

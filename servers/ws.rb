@@ -1,9 +1,5 @@
-require 'sinatra'
+require_relative '../config/initializer'
 require 'sinatra-websocket'
-require "bunny"
-require 'json'
-require 'redis'
-require_relative '../account_model'
 
 set :server, 'thin'
 set :port, 3101

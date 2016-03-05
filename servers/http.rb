@@ -1,9 +1,5 @@
-require 'sinatra'
-require "sinatra/multi_route"
-require "bunny"
-require 'json'
-require 'redis'
-require_relative '../account_model'
+require_relative '../config/initializer'
+require 'sinatra/multi_route'
 
 set :server, 'thin'
 set :port, 3102

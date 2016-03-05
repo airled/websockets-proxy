@@ -1,5 +1,5 @@
 require File.expand_path '../spec_helper.rb', __FILE__
-require File.expand_path '../../account_model.rb', __FILE__
+require File.expand_path '../../models/account_model.rb', __FILE__
 
 describe "Account model" do
 
