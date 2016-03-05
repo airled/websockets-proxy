@@ -5,8 +5,8 @@ require_relative '../config/initializer'
 set :server, 'thin'
 set :port, 3101
 
-PORTLIST = Redis.new(db: '15')
-PORTLIST.flushdb
+portlist = Portlist.new
+portlist.clear
 
 def valid?(init_message)
   init_message.has_key?('email') && init_message.has_key?('password')
@@ -43,7 +43,7 @@ get '/' do
           ws.send('auth_ok')
           p "Queue '#{account.queue}' is bound up with port '#{account.port}'"
           authenticated = true
-          PORTLIST.set(account.port, account.queue)
+          portlist.bind(account.port, account.queue)
           account.activate
 
           queue = channel.queue(account.queue)
@@ -63,7 +63,7 @@ get '/' do
     ws.onclose do
       puts 'Websocket closed'
       connection.close
-      PORTLIST.del(account.port) && account.deactivate if account
+      portlist.unbind(account.port) && account.deactivate if account
     end
 
   end #websocket

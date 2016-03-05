@@ -4,8 +4,6 @@ require File.expand_path '../../servers/http.rb', __FILE__
 describe "HTTP server" do
 
   before(:all) do
-    PORTLIST = Redis.new(db: '14')
-    PORTLIST.set('1234', 'test')
   end
 
   it "should build proper url from request environment directly from thin" do
@@ -18,14 +16,6 @@ describe "HTTP server" do
     request_env = {'HTTP_HOST' => 'test http://1.1.1.1:1111/test test', 'REQUEST_URI' => '/test'}
     get_request_data(request_env)
     expect(get_request_data(request_env)[:url]).to eql('http://1.1.1.1:1111/test')
-  end
-
-  it "should find activated port in port list" do
-    expect(port_is_not_active?('1234')).to eql(false)
-  end
-
-  it "should not find deactivated port in port list" do
-    expect(port_is_not_active?('1235')).to eql(true)
   end
 
   # it "should return status 404 if personal port is not active" do
@@ -48,7 +38,6 @@ describe "HTTP server" do
   # end
 
   after(:all) do
-    PORTLIST.flushdb
   end
 
 end

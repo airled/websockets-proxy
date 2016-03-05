@@ -5,7 +5,7 @@ require_relative '../config/initializer'
 set :server, 'thin'
 set :port, 3102
 
-PORTLIST = Redis.new(db: '15')
+portlist = Portlist.new
 
 def get_request_data(request_env)
   host = request_env['HTTP_HOST']
@@ -21,14 +21,10 @@ def get_request_data(request_env)
   }
 end
 
-def port_is_not_active?(port)
-  PORTLIST.get(port).nil?
-end
-
 route :get, :post, :put, :delete, :head, '/*' do
   
   personal_port = request.env['HTTP_PERSONALPORT']
-  if port_is_not_active?(personal_port)
+  if !portlist.include?(personal_port)
     status 404
     body 'No websocket for this port'
   else

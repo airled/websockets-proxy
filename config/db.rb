@@ -3,7 +3,7 @@ require 'mysql2'
 
 ENV['RACK_ENV'] ||= 'development'
 
-database = 
+def get_db
   case ENV['RACK_ENV']
   when 'development'
     'ws_development'
@@ -12,10 +12,11 @@ database =
   when 'test'
     'ws_test'
   end
+end
 
 DB = Sequel.connect(
   adapter: 'mysql2',
   host: 'localhost',
   user: 'root',
-  database: database
+  database: get_db
 )
