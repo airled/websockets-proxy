@@ -1,4 +1,3 @@
-require 'sinatra'
 require 'bunny'
 require 'json'
 require 'redis'

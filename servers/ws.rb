@@ -1,5 +1,6 @@
-require_relative '../config/initializer'
+require 'sinatra'
 require 'sinatra-websocket'
+require_relative '../config/initializer'
 
 set :server, 'thin'
 set :port, 3101
