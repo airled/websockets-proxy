@@ -24,13 +24,13 @@
       "name": "E-mail",
       "title": "E-mail",
       "type": "string",
-      "value": ""
+      "value": "vm88@mail.ru"
     },
     {
       "name": "Password",
       "title": "Password",
       "type": "string",
-      "value": ""
+      "value": "12345678"
     }
   ]
 }

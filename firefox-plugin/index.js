@@ -2,7 +2,11 @@ var address = require('sdk/simple-prefs').prefs["Address"],
     email = require('sdk/simple-prefs').prefs["E-mail"],
     password = require('sdk/simple-prefs').prefs["Password"],
     notification = require("sdk/notifications"),
-    { ToggleButton } = require("sdk/ui/button/toggle");
+    { ToggleButton } = require("sdk/ui/button/toggle"),
+    panels = require("sdk/panel");
+    self = require("sdk/self");
+
+var wsState = 'off';
 
 var button = ToggleButton({
   id: "Websocket",
@@ -12,13 +16,59 @@ var button = ToggleButton({
     "32": "./32.png",
     "64": "./64.png"
   },
-  onChange: handleButton
+  onChange: handleButtonChange
 });
 
-function handleButton(state) {
-  if (state.checked) {
+var buttonPanel = panels.Panel({
+  width: 170,
+  height: 70,
+  contentURL: self.data.url("button_panel/button_panel.html"),
+  contentScriptFile: "./button_panel/button_panel.js",
+  onHide: handleButtonPanelHide
+});
 
-    pageWorker = require("sdk/page-worker").Page({
+var prefsPanel = panels.Panel({
+  width: 290,
+  height: 220,
+  contentURL: self.data.url("prefs_panel/prefs_panel.html"),
+  contentScriptFile: "./prefs_panel/prefs_panel.js"
+});
+
+function handleButtonChange(state) {
+  if (state.checked) {
+    buttonPanel.show({
+      position: button
+    });
+  }
+}
+
+function handleButtonPanelHide() {
+  button.state('window', {checked: false});
+}
+
+buttonPanel.port.on('pluginMenuClick', function(title) {
+  if (title === 'ws') {
+    wsSwitch();
+  }
+  else if (title === 'proxy') {
+    console.log('works');
+  }
+  else if (title === 'prefs') {
+    handlePrefsPanel();
+  }
+});
+
+prefsPanel.port.on('close', function(msg) {
+  prefsPanel.hide();
+});
+
+function wsSwitch() {
+  if (wsState === 'off') {
+
+    wsState = 'on';
+
+    buttonPanel.port.emit('turned_on', 'on');
+      pageWorker = require("sdk/page-worker").Page({
       contentScriptFile: "./script.js"
     });
 
@@ -83,10 +133,16 @@ function handleButton(state) {
     });
   }
   else {
+    wsState = 'off';
+    buttonPanel.port.emit('turned_off', 'off');
     pageWorker.destroy();
     notification.notify({
       title: 'Websocket',
       text: "Locally closed"
     });
   }
+}
+
+function handlePrefsPanel(){
+  prefsPanel.show();
 }

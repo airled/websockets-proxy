@@ -1,0 +1,6 @@
+div{
+	cursor: default;
+}
+div:hover{
+	background-color: white;
+}
