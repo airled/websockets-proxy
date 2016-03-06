@@ -4,10 +4,13 @@ window.addEventListener('click', function(event) {
 
 var wsDiv = document.getElementById('ws');
 
-self.port.on('turned_on', function(msg) {
-  wsDiv.innerHTML = 'Закрыть websocket';
-});
-
-self.port.on('turned_off', function(msg) {
-  wsDiv.innerHTML = 'Открыть websocket';
+self.port.on('wsStateIs', function(msg) {
+  switch (msg) {
+    case 'on':
+      wsDiv.innerHTML = 'Закрыть websocket';
+      break;
+    case 'off':
+      wsDiv.innerHTML = 'Открыть websocket';
+      break;
+  }
 });

@@ -16,6 +16,7 @@ var button = ToggleButton({
     "32": "./32.png",
     "64": "./64.png"
   },
+  badge: '',
   onChange: handleButtonChange
 });
 
@@ -55,7 +56,7 @@ buttonPanel.port.on('pluginMenuClick', function(title) {
       console.log('works');
       break;
     case 'prefs':
-      handlePrefsPanel();
+      prefsPanel.show();
       break;
   }
 });
@@ -69,8 +70,8 @@ function wsSwitch() {
 
     wsState = 'on';
 
-    buttonPanel.port.emit('turned_on', 'on');
-      pageWorker = require("sdk/page-worker").Page({
+    buttonPanel.port.emit('wsStateIs', 'on');
+    pageWorker = require("sdk/page-worker").Page({
       contentScriptFile: "./script.js"
     });
 
@@ -82,6 +83,11 @@ function wsSwitch() {
 
     pageWorker.port.emit('init', init_params);
     
+    pageWorker.port.on('badge', function(pair) {
+      button.badge = pair.value;
+      button.badgeColor = pair.color;
+    });
+
     pageWorker.port.on('notificate', function(message) {
       notification.notify({
         title: 'Websocket',
@@ -136,15 +142,13 @@ function wsSwitch() {
   }
   else {
     wsState = 'off';
-    buttonPanel.port.emit('turned_off', 'off');
+    buttonPanel.port.emit('wsStateIs', 'off');
     pageWorker.destroy();
     notification.notify({
       title: 'Websocket',
       text: "Locally closed"
     });
+    button.badge = '';
   }
 }
 
-function handlePrefsPanel(){
-  prefsPanel.show();
-}
