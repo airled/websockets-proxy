@@ -3,7 +3,7 @@ var address = require('sdk/simple-prefs').prefs["Address"],
     password = require('sdk/simple-prefs').prefs["Password"],
     notification = require("sdk/notifications"),
     { ToggleButton } = require("sdk/ui/button/toggle"),
-    panels = require("sdk/panel");
+    panels = require("sdk/panel"),
     self = require("sdk/self");
 
 var wsState = 'off';
@@ -47,14 +47,16 @@ function handleButtonPanelHide() {
 }
 
 buttonPanel.port.on('pluginMenuClick', function(title) {
-  if (title === 'ws') {
-    wsSwitch();
-  }
-  else if (title === 'proxy') {
-    console.log('works');
-  }
-  else if (title === 'prefs') {
-    handlePrefsPanel();
+  switch (title) {
+    case 'ws':
+      wsSwitch();
+      break;
+    case 'proxy':
+      console.log('works');
+      break;
+    case 'prefs':
+      handlePrefsPanel();
+      break;
   }
 });
 
