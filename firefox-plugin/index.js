@@ -72,7 +72,7 @@ function wsSwitch() {
 
     buttonPanel.port.emit('wsStateIs', 'on');
     pageWorker = require("sdk/page-worker").Page({
-      contentScriptFile: "./script.js"
+      contentScriptFile: "./pageworker_script.js"
     });
 
     var init_params = {

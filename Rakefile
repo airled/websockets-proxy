@@ -33,3 +33,7 @@ end
 task :prod do
   system 'RACK_ENV=production foreman start'
 end
+
+task :dp do
+  system 'scp firefox-plugin/@websockets-proxy-0.1.0.xpi wsweb@51.254.10.211:/home/wsweb/current/public/'
+end
