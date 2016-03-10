@@ -3,6 +3,7 @@ self.port.on('setprefs', function(prefs){
   document.getElementById('email').setAttribute('value', prefs.email);
   document.getElementById('password').setAttribute('value', prefs.password);
   document.getElementById('proxyaddress').setAttribute('value', prefs.proxyaddress);
+  document.getElementById('timeout').setAttribute('value', prefs.timeout);
 });
 
 window.addEventListener('click', function(event) {
@@ -16,8 +17,9 @@ window.addEventListener('click', function(event) {
         email: document.getElementById('email').value,
         password: document.getElementById('password').value,
         proxyaddress: document.getElementById('proxyaddress').value,
+        timeout: document.getElementById('timeout').value
       });
       self.port.emit('close', '');
       break;
-  };
+  }
 }, false);

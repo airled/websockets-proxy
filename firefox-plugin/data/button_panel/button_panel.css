@@ -1,6 +1,6 @@
 div{
 	cursor: default;
-	padding: 0px 0px 0px 5px;
+	padding-left: 5px;
 }
 div:hover{
 	background-color: white;

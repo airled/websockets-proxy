@@ -37,6 +37,12 @@
       "title": "Proxy-address",
       "type": "string",
       "value": ""
+    },
+    {
+      "name": "Reconnection timeout",
+      "title": "Reconnection timeout",
+      "type": "string",
+      "value": "10"
     }
   ]
 }

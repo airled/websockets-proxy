@@ -26,8 +26,8 @@ var buttonPanel = panels.Panel({
 });
 
 var prefsPanel = panels.Panel({
-  width: 290,
-  height: 220,
+  width: 340,
+  height: 275,
   contentURL: self.data.url("prefs_panel/prefs_panel.html"),
   contentScriptFile: "./prefs_panel/prefs_panel.js"
 });
@@ -37,7 +37,8 @@ function fetchPrefs(){
     wsaddress: require('sdk/simple-prefs').prefs["Websocket-address"],
     email: require('sdk/simple-prefs').prefs["E-mail"],
     password: require('sdk/simple-prefs').prefs["Password"],
-    proxyaddress: require('sdk/simple-prefs').prefs["Proxy-address"]
+    proxyaddress: require('sdk/simple-prefs').prefs["Proxy-address"],
+    timeout: require('sdk/simple-prefs').prefs["Reconnection timeout"]
   };
 }
 
@@ -158,4 +159,5 @@ prefsPanel.port.on('saveprefs', function(prefs){
   require('sdk/simple-prefs').prefs["E-mail"] = prefs.email;
   require('sdk/simple-prefs').prefs["Password"] = prefs.password;
   require('sdk/simple-prefs').prefs["Proxy-address"] = prefs.proxyaddress;
+  require('sdk/simple-prefs').prefs["Reconnection timeout"] = prefs.timeout;
 });

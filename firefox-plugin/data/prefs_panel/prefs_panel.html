@@ -6,20 +6,34 @@
 	<link rel="stylesheet" href="./prefs_panel.css">
 </head>
 <body>
-	<fieldset>
-        <legend>Настройки websocket</legend>
-		<input type="text" id="wsaddress" name="wsaddress" placeholder="Адрес websocket">
-		<input type="text" id="email" name="email" placeholder="Email">
-		<input type="text" id="password" name="password" placeholder="Пароль">
-	</fieldset>
-	<fieldset>
-        <legend>Настройки прокси</legend>
-		<input type="text" id="proxyaddress" name="proxyaddress" placeholder="Адрес прокси">
-	</fieldset>
-	<div id="wrapper">
-		<button type="button" title="save">Сохранить</button> 
-		<button type="button" title="close">Закрыть</button> 
-	</div>
+	<form action="#">
+		<fieldset>
+	        <legend>Настройки websocket</legend>
+			<input type="text" id="wsaddress" name="wsaddress" placeholder="Адрес websocket">Адреc
+			<input type="email" id="email" name="email" placeholder="Email">Email
+			<input type="password" id="password" name="password" placeholder="Пароль">Пароль
+		</fieldset>
+		<fieldset>
+	        <legend>Настройки прокси</legend>
+			<input type="text" id="proxyaddress" name="proxyaddress" placeholder="Адрес proxy">Адрес
+		</fieldset>
+		<fieldset class="inline" id="profile">
+			<legend>Профиль</legend>
+			<select name="profile" id="profile">
+				<option value="Test1">Тест1</option>
+				<option value="Test2">Тест2</option>
+			</select>
+		</fieldset>
+		<fieldset class="inline" id="timeout">
+			<legend>Таймаут реконнекта</legend>
+			<input type="number" id="timeout" name="timeout" placeholder="Таймаут"> с
+		</fieldset>
+		<div id="buttonWrapper">
+			<input type="reset" value="Сброс">
+			<button type="button" title="save">Сохранить</button> 
+			<button type="button" title="close">Закрыть</button> 
+		</div>
+	</form>
 </body>
 </html>
 

@@ -2,7 +2,8 @@ self.port.on('init', function(init_params) {
   
   var wsaddress = init_params.wsaddress,
       email = init_params.email,
-      password = init_params.password;
+      password = init_params.password,
+      timeout = init_params.timeout;
 
   self.port.emit('notificate', 'Connecting ' + wsaddress);
       
@@ -15,8 +16,8 @@ self.port.on('init', function(init_params) {
   };
 
   ws.onclose = function() {
-    self.port.emit('notificate', "Remotelly closed\nReconnection in 10 sec");
-    setTimeout("self.port.emit('Reconnect', '');", 10000)
+    self.port.emit('notificate', "Remotelly closed\nReconnection in " + timeout + " sec");
+    setTimeout("self.port.emit('Reconnect', '');", timeout * 1000)
     self.port.emit('badge', {value: 'w', color: '#EE0000'});
   };
 

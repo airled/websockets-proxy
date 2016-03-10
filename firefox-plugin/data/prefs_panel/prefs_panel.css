@@ -1,5 +1,13 @@
 #wrapper{
 	width: 100%;
-	padding: 5px 0px 0px 0px;
 	text-align: right;
+}
+fieldset.inline{
+	display: inline-block;
+}
+#profile{
+	width: 90px;
+}
+#buttonWrapper{
+	float: right;
 }
