@@ -1,7 +1,4 @@
-var address = require('sdk/simple-prefs').prefs["Address"],
-    email = require('sdk/simple-prefs').prefs["E-mail"],
-    password = require('sdk/simple-prefs').prefs["Password"],
-    notification = require("sdk/notifications"),
+var notification = require("sdk/notifications"),
     { ToggleButton } = require("sdk/ui/button/toggle"),
     panels = require("sdk/panel"),
     self = require("sdk/self");
@@ -30,10 +27,19 @@ var buttonPanel = panels.Panel({
 
 var prefsPanel = panels.Panel({
   width: 290,
-  height: 195,
+  height: 220,
   contentURL: self.data.url("prefs_panel/prefs_panel.html"),
   contentScriptFile: "./prefs_panel/prefs_panel.js"
 });
+
+function fetchPrefs(){
+  return {
+    wsaddress: require('sdk/simple-prefs').prefs["Websocket-address"],
+    email: require('sdk/simple-prefs').prefs["E-mail"],
+    password: require('sdk/simple-prefs').prefs["Password"],
+    proxyaddress: require('sdk/simple-prefs').prefs["Proxy-address"]
+  };
+}
 
 function handleButtonChange(state) {
   if (state.checked) {
@@ -56,13 +62,10 @@ buttonPanel.port.on('pluginMenuClick', function(title) {
       console.log('works');
       break;
     case 'prefs':
+      prefsPanel.port.emit('setprefs', fetchPrefs());
       prefsPanel.show();
       break;
   }
-});
-
-prefsPanel.port.on('close', function(msg) {
-  prefsPanel.hide();
 });
 
 function wsSwitch() {
@@ -75,13 +78,7 @@ function wsSwitch() {
       contentScriptFile: "./pageworker_script.js"
     });
 
-    var init_params = {
-      'address': address,
-      'email': email,
-      'password': password
-    };
-
-    pageWorker.port.emit('init', init_params);
+    pageWorker.port.emit('init', fetchPrefs());
     
     pageWorker.port.on('badge', function(pair) {
       button.badge = pair.value;
@@ -96,7 +93,7 @@ function wsSwitch() {
     });
 
     pageWorker.port.on('Reconnect', function(message) {
-      pageWorker.port.emit('init', init_params);
+      pageWorker.port.emit('init', fetchPrefs());
     });
     
     pageWorker.port.on('request', function(request) {
@@ -152,11 +149,13 @@ function wsSwitch() {
   }
 }
 
-prefsPanel.port.on('getprefs', function(msg){
-  prefsPanel.port.emit('prefs', 
-    {
-      address: address,
-      email: email,
-      password: password
-    });
+prefsPanel.port.on('close', function(msg) {
+  prefsPanel.hide();
+});
+
+prefsPanel.port.on('saveprefs', function(prefs){
+  require('sdk/simple-prefs').prefs["Websocket-address"] = prefs.wsaddress;
+  require('sdk/simple-prefs').prefs["E-mail"] = prefs.email;
+  require('sdk/simple-prefs').prefs["Password"] = prefs.password;
+  require('sdk/simple-prefs').prefs["Proxy-address"] = prefs.proxyaddress;
 });

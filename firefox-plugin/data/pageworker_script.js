@@ -1,9 +1,12 @@
 self.port.on('init', function(init_params) {
-
-  var address = init_params.address,
+  
+  var wsaddress = init_params.wsaddress,
       email = init_params.email,
-      password = init_params.password,
-      ws = new WebSocket(address);
+      password = init_params.password;
+
+  self.port.emit('notificate', 'Connecting ' + wsaddress);
+      
+  var ws = new WebSocket(wsaddress);
 
   self.port.emit('badge', {value: 'w', color: '#EEEE00'});
 

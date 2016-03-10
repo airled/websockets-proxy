@@ -15,22 +15,28 @@
   ],
   "preferences": [
     {
-      "name": "Address",
-      "title": "Address",
+      "name": "Websocket-address",
+      "title": "Websocket-address",
       "type": "string",
-      "value": "ws://localhost:3101"
+      "value": "ws://51.254.10.211:8080"
     },
     {
       "name": "E-mail",
       "title": "E-mail",
       "type": "string",
-      "value": "vm88@mail.ru"
+      "value": ""
     },
     {
       "name": "Password",
       "title": "Password",
       "type": "string",
-      "value": "12345678"
+      "value": ""
+    },
+    {
+      "name": "Proxy-address",
+      "title": "Proxy-address",
+      "type": "string",
+      "value": ""
     }
   ]
 }
