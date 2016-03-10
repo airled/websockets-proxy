@@ -23,7 +23,8 @@ end
 
 route :get, :post, :put, :delete, :head, '/*' do
   
-  personal_port = request.env['HTTP_PERSONALPORT']
+  personal_port = '3102'
+  # personal_port = request.env['HTTP_PERSONALPORT']
   if !portlist.include?(personal_port)
     status 404
     body 'No websocket for this port'

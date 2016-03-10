@@ -30,7 +30,7 @@ var buttonPanel = panels.Panel({
 
 var prefsPanel = panels.Panel({
   width: 290,
-  height: 220,
+  height: 195,
   contentURL: self.data.url("prefs_panel/prefs_panel.html"),
   contentScriptFile: "./prefs_panel/prefs_panel.js"
 });
@@ -152,3 +152,11 @@ function wsSwitch() {
   }
 }
 
+prefsPanel.port.on('getprefs', function(msg){
+  prefsPanel.port.emit('prefs', 
+    {
+      address: address,
+      email: email,
+      password: password
+    });
+});
