@@ -27,6 +27,10 @@ task :plugin do
   system 'cd ./firefox-plugin && jpm run -b /usr/bin/firefox'
 end
 
+task :x do
+  system 'cd ./firefox-plugin && jpm xpi'
+end
+
 task :p => :plugin do
 end
 
@@ -35,5 +39,5 @@ task :prod do
 end
 
 task :dp do
-  system 'scp firefox-plugin/@websockets-proxy-0.1.0.xpi wsweb@51.254.10.211:/home/wsweb/current/public/'
+  system 'scp firefox-plugin/@bproxy-0.2.0.xpi wsweb@51.254.10.211:/home/wsweb/current/public/'
 end

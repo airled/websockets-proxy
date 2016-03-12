@@ -7,8 +7,8 @@ var notification = require("sdk/notifications"),
 var wsState = 'off';
 
 var button = ToggleButton({
-  id: "Websocket",
-  label: "Open a websocket",
+  id: "bproxy",
+  label: "BProxy",
   icon: {
     "16": "./16.png",
     "32": "./32.png",
@@ -33,7 +33,7 @@ var prefsPanel = panels.Panel({
   contentScriptFile: "./prefs_panel/prefs_panel.js"
 });
 
-function fetchPrefs(){
+function fetchPrefs() {
   return {
     wsaddress: preferences.prefs["Websocket-address"],
     email: preferences.prefs["E-mail"],
@@ -55,25 +55,10 @@ function handleButtonPanelHide() {
   button.state('window', {checked: false});
 }
 
-buttonPanel.port.on('pluginMenuClick', function(title) {
-  switch (title) {
-    case 'ws':
-      wsSwitch();
-      break;
-    case 'proxy':
-      console.log('works');
-      break;
-    case 'prefs':
-      prefsPanel.port.emit('setprefs', fetchPrefs());
-      prefsPanel.show();
-      break;
-  }
-});
-
 function wsSwitch() {
   if (wsState === 'off') {
 
-    prefs = fetchPrefs();
+    let prefs = fetchPrefs();
     if (prefs.wsaddress === '' || prefs.email === '' || prefs.password === '') {
       notification.notify({
         title: 'Websocket',
@@ -89,7 +74,7 @@ function wsSwitch() {
       contentScriptFile: "./pageworker_script.js"
     });
 
-    pageWorker.port.emit('init', fetchPrefs());
+    pageWorker.port.emit('init', prefs);
     
     pageWorker.port.on('badge', function(pair) {
       button.badge = pair.value;
@@ -164,10 +149,25 @@ prefsPanel.port.on('close', function(msg) {
   prefsPanel.hide();
 });
 
-prefsPanel.port.on('saveprefs', function(prefs){
+prefsPanel.port.on('saveprefs', function(prefs) {
   preferences.prefs["Websocket-address"] = prefs.wsaddress;
   preferences.prefs["E-mail"] = prefs.email;
   preferences.prefs["Password"] = prefs.password;
   preferences.prefs["Proxy-address"] = prefs.proxyaddress;
   preferences.prefs["Reconnection timeout"] = prefs.timeout;
+});
+
+buttonPanel.port.on('pluginMenuClick', function(title) {
+  switch (title) {
+    case 'ws':
+      wsSwitch();
+      break;
+    case 'proxy':
+      console.log('works');
+      break;
+    case 'prefs':
+      prefsPanel.port.emit('setprefs', fetchPrefs());
+      prefsPanel.show();
+      break;
+  }
 });

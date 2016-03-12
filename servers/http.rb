@@ -23,8 +23,8 @@ end
 
 route :get, :post, :put, :delete, :head, '/*' do
   
-  personal_port = '3102'
-  # personal_port = request.env['HTTP_PERSONALPORT']
+  # personal_port = '3102'
+  personal_port = request.env['HTTP_PERSONALPORT']
   if !portlist.include?(personal_port)
     status 404
     body 'No websocket for this port'
@@ -36,12 +36,12 @@ route :get, :post, :put, :delete, :head, '/*' do
     connection.start
     channel = connection.create_channel
     exchange = channel.default_exchange
-    queue_exclusive = channel.queue("", :exclusive => true)
+    queue_exclusive = channel.queue('', exclusive: true)
     routing_key = Account[port: personal_port].queue
 
-    exchange.publish(data_hash.merge(reply_to: queue_exclusive.name).to_json, :routing_key => routing_key)
+    exchange.publish(data_hash.merge(reply_to: queue_exclusive.name).to_json, routing_key: routing_key)
     
-    queue_exclusive.subscribe(:block => true) do |delivery_info, metadata, payload|
+    queue_exclusive.subscribe(block: true) do |delivery_info, metadata, payload|
       answer = JSON.parse(payload)
       delivery_info.consumer.cancel
     end

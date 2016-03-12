@@ -56,7 +56,7 @@ get '/' do
         end
       else
         reply_to = JSON.parse(response)['reply_to']
-        exchange.publish(response, :routing_key => reply_to)
+        exchange.publish(response, routing_key: reply_to)
       end
     end
 
