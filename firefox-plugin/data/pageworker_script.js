@@ -16,20 +16,23 @@ self.port.on('init', function(init_params) {
   };
 
   ws.onclose = function() {
+    if (timeout === '' || timeout < 10) {
+      timeout = 10;
+    }
     self.port.emit('notificate', "Remotelly closed\nReconnection in " + timeout + " sec");
-    setTimeout("self.port.emit('Reconnect', '');", timeout * 1000)
+    setTimeout("self.port.emit('Reconnect', '');", timeout * 1000);
     self.port.emit('badge', {value: 'w', color: '#EE0000'});
   };
 
   ws.onmessage = function(request) {
-    if (request.data == 'login') {
+    if (request.data === 'login') {
       var init_message = {
         'email': email,
         'password': password
       };
       ws.send(JSON.stringify(init_message));
     }
-    else if (request.data == 'auth_ok') {
+    else if (request.data === 'auth_ok') {
       self.port.emit('notificate', 'Successfully authenticated');
       self.port.emit('badge', {value: 'w', color: '#008800'});
     }

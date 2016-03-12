@@ -1,6 +1,7 @@
 var notification = require("sdk/notifications"),
     { ToggleButton } = require("sdk/ui/button/toggle"),
     panels = require("sdk/panel"),
+    preferences = require('sdk/simple-prefs'),
     self = require("sdk/self");
 
 var wsState = 'off';
@@ -34,11 +35,11 @@ var prefsPanel = panels.Panel({
 
 function fetchPrefs(){
   return {
-    wsaddress: require('sdk/simple-prefs').prefs["Websocket-address"],
-    email: require('sdk/simple-prefs').prefs["E-mail"],
-    password: require('sdk/simple-prefs').prefs["Password"],
-    proxyaddress: require('sdk/simple-prefs').prefs["Proxy-address"],
-    timeout: require('sdk/simple-prefs').prefs["Reconnection timeout"]
+    wsaddress: preferences.prefs["Websocket-address"],
+    email: preferences.prefs["E-mail"],
+    password: preferences.prefs["Password"],
+    proxyaddress: preferences.prefs["Proxy-address"],
+    timeout: preferences.prefs["Reconnection timeout"]
   };
 }
 
@@ -71,6 +72,15 @@ buttonPanel.port.on('pluginMenuClick', function(title) {
 
 function wsSwitch() {
   if (wsState === 'off') {
+
+    prefs = fetchPrefs();
+    if (prefs.wsaddress === '' || prefs.email === '' || prefs.password === '') {
+      notification.notify({
+        title: 'Websocket',
+        text: 'Some fields are empty'
+      });
+      return;
+    }
 
     wsState = 'on';
 
@@ -155,9 +165,9 @@ prefsPanel.port.on('close', function(msg) {
 });
 
 prefsPanel.port.on('saveprefs', function(prefs){
-  require('sdk/simple-prefs').prefs["Websocket-address"] = prefs.wsaddress;
-  require('sdk/simple-prefs').prefs["E-mail"] = prefs.email;
-  require('sdk/simple-prefs').prefs["Password"] = prefs.password;
-  require('sdk/simple-prefs').prefs["Proxy-address"] = prefs.proxyaddress;
-  require('sdk/simple-prefs').prefs["Reconnection timeout"] = prefs.timeout;
+  preferences.prefs["Websocket-address"] = prefs.wsaddress;
+  preferences.prefs["E-mail"] = prefs.email;
+  preferences.prefs["Password"] = prefs.password;
+  preferences.prefs["Proxy-address"] = prefs.proxyaddress;
+  preferences.prefs["Reconnection timeout"] = prefs.timeout;
 });

@@ -2,7 +2,7 @@
 	width: 100%;
 	text-align: right;
 }
-fieldset.inline{
+.inline{
 	display: inline-block;
 }
 #profile{
