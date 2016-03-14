@@ -2,7 +2,8 @@ var notification = require("sdk/notifications"),
     { ToggleButton } = require("sdk/ui/button/toggle"),
     panels = require("sdk/panel"),
     preferences = require('sdk/simple-prefs'),
-    storage = require("sdk/simple-storage"),
+    storage = require("sdk/simple-storage").storage,
+    browserConfig = require("sdk/preferences/service"),
     self = require("sdk/self");
 
 var wsState = 'off';
@@ -28,6 +29,14 @@ var buttonPanel = panels.Panel({
   onHide: handleButtonPanelHide
 });
 
+if (proxyState === 'on') {
+  setBadge('p', '#0000EE');
+  buttonPanel.port.emit('proxyStateIs', 'on');
+}
+else {
+  buttonPanel.port.emit('proxyStateIs', 'off');
+}
+
 var prefsPanel = panels.Panel({
   width: 340,
   height: 275,
@@ -40,7 +49,7 @@ function fetchPrefs() {
     wsaddress: preferences.prefs["Websocket-address"],
     email: preferences.prefs["E-mail"],
     password: preferences.prefs["Password"],
-    proxyaddress: preferences.prefs["Proxy-address"],
+    proxyaddress: preferences.prefs["Proxy address"],
     timeout: preferences.prefs["Reconnection timeout"]
   };
 }
@@ -79,8 +88,7 @@ function wsSwitch() {
     pageWorker.port.emit('init', prefs);
     
     pageWorker.port.on('badge', function(pair) {
-      button.badge = pair.value;
-      button.badgeColor = pair.color;
+      setBadge(pair.value, pair.color);
     });
 
     pageWorker.port.on('notificate', function(message) {
@@ -143,7 +151,7 @@ function wsSwitch() {
       title: 'Websocket',
       text: "Locally closed"
     });
-    button.badge = '';
+    setBadge('', '');
   }
 }
 
@@ -155,7 +163,7 @@ prefsPanel.port.on('saveprefs', function(prefs) {
   preferences.prefs["Websocket-address"] = prefs.wsaddress;
   preferences.prefs["E-mail"] = prefs.email;
   preferences.prefs["Password"] = prefs.password;
-  preferences.prefs["Proxy-address"] = prefs.proxyaddress;
+  preferences.prefs["Proxy address"] = prefs.proxyaddress;
   preferences.prefs["Reconnection timeout"] = prefs.timeout;
 });
 
@@ -165,10 +173,7 @@ buttonPanel.port.on('pluginMenuClick', function(title) {
       wsSwitch();
       break;
     case 'proxy':
-      switchProxyValues();
-      console.log(proxyState);
-      // proxyState = 'on';
-      // console.log('works');
+      switchProxyState();
       break;
     case 'prefs':
       prefsPanel.port.emit('setprefs', fetchPrefs());
@@ -177,26 +182,74 @@ buttonPanel.port.on('pluginMenuClick', function(title) {
   }
 });
 
-function switchProxyValues() {
-  // let proxyPrefs = getProxyPrefs();
-  // if (proxyPrefs.proxyAddress === '' || proxyPrefs.proxyPort === '') {
-  //   notification.notify({
-  //     title: 'Websocket',
-  //     text: 'Some fields are empty'
-  //   });
-  //   return;    
-  // }
+function switchProxyState(){
+  let proxyaddress = fetchPrefs().proxyaddress;
+  if (proxyaddress === '') {
+    notification.notify({
+      title: 'Websocket',
+      text: 'Proxy address is empty'
+    });
+    return;    
+  }
+  else{
+    proxyIp = proxyaddress.replace('http://', '').split(':')[0];
+    proxyPort = parseInt(proxyaddress.replace('http://', '').split(':')[1], 10);
+  }
   if (proxyState != 'on') {
+    storage.proxyState = 'on';
     proxyState = 'on';
-    // network.proxy.type = 1;
-    // network.proxy.socks = '';
-    // network.proxy.socks_port = 0;
-    // network.proxy.socks_remote_dns = false;
-    // network.proxy.no_proxies_on = 'localhost, 127.0.0.1';
-    // network.proxy.ssl = '';
-    // network.proxy.ssl_port = 0;
+    buttonPanel.port.emit('proxyStateIs', 'on');
+    setBadge('p', '#0000EE');
+    saveCurrentBrowserSettings();
+    setConfig('network.proxy.type', 1);
+    setConfig('network.proxy.http', proxyIp);
+    setConfig('network.proxy.http_port', proxyPort);
+    setConfig('network.proxy.no_proxies_on', 'localhost, 127.0.0.1');
   }
   else {
+    storage.proxyState = 'off';
     proxyState = 'off';
+    buttonPanel.port.emit('proxyStateIs', 'off');
+    setBadge('', '');
+    if (typeof storage.old == "undefined" || isEmpty(storage.old)) {
+      browserConfig.reset('network.proxy.type');
+      browserConfig.reset('network.proxy.http');
+      browserConfig.reset('network.proxy.http_port');
+      browserConfig.reset('network.proxy.no_proxies_on');
+    }
+    else {
+      setConfig('network.proxy.type', storage.old.type);
+      setConfig('network.proxy.http', storage.old.http);
+      setConfig('network.proxy.http_port', storage.old.port);
+      setConfig('network.proxy.no_proxies_on', storage.old.no);
+      delete storage.old;      
+    }
   }
+}
+
+function setBadge(char, color){
+  button.badge = char;
+  button.badgeColor = color;
+}
+
+function setConfig(name, value) {
+  browserConfig.set(name, value);
+}
+
+function saveCurrentBrowserSettings() {
+  storage.old = {
+    type: browserConfig.get('network.proxy.type'),
+    http: browserConfig.get('network.proxy.http'),
+    port: browserConfig.get('network.proxy.http_port'),
+    no:   browserConfig.get('network.proxy.no_proxies_on')
+  }
+}
+
+function isEmpty(obj) {
+  for (let prop in obj) { 
+    if (obj.hasOwnProperty(prop)) { 
+      return false;
+    }
+  }
+  return true;
 }
