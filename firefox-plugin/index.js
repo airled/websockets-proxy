@@ -1,12 +1,12 @@
 var notification = require("sdk/notifications"),
     { ToggleButton } = require("sdk/ui/button/toggle"),
     panels = require("sdk/panel"),
-    preferences = require('sdk/simple-prefs'),
+    preferences = require("sdk/simple-prefs"),
     storage = require("sdk/simple-storage").storage,
     browserConfig = require("sdk/preferences/service"),
     self = require("sdk/self");
 
-var wsState = 'off';
+var wsState = "off";
 var proxyState = storage.proxyState;
 
 var button = ToggleButton({
@@ -17,7 +17,7 @@ var button = ToggleButton({
     "32": "./32.png",
     "64": "./64.png"
   },
-  badge: '',
+  badge: "",
   onChange: handleButtonChange
 });
 
@@ -29,12 +29,12 @@ var buttonPanel = panels.Panel({
   onHide: handleButtonPanelHide
 });
 
-if (proxyState === 'on') {
-  setBadge('p', '#0000EE');
-  buttonPanel.port.emit('proxyStateIs', 'on');
+if (proxyState === "on") {
+  setBadge("p", "#0000EE");
+  buttonPanel.port.emit("proxyStateIs", "on");
 }
 else {
-  buttonPanel.port.emit('proxyStateIs', 'off');
+  buttonPanel.port.emit("proxyStateIs", "off");
 }
 
 var prefsPanel = panels.Panel({
@@ -63,103 +63,94 @@ function handleButtonChange(state) {
 }
 
 function handleButtonPanelHide() {
-  button.state('window', {checked: false});
+  button.state("window", {checked: false});
 }
 
 function wsSwitch() {
-  if (wsState === 'off') {
+  if (wsState === "off") {
 
     let prefs = fetchPrefs();
-    if (prefs.wsaddress === '' || prefs.email === '' || prefs.password === '') {
-      notification.notify({
-        title: 'Websocket',
-        text: 'Some fields are empty'
-      });
+    if (prefs.wsaddress === "" || prefs.email === "" || prefs.password === "") {
+      notify("Some fields are empty");
       return;
     }
 
-    wsState = 'on';
+    wsState = "on";
 
-    buttonPanel.port.emit('wsStateIs', 'on');
+    buttonPanel.port.emit("wsStateIs", "on");
     pageWorker = require("sdk/page-worker").Page({
       contentScriptFile: "./pageworker_script.js"
     });
 
-    pageWorker.port.emit('init', prefs);
+    pageWorker.port.emit("init", prefs);
     
-    pageWorker.port.on('badge', function(pair) {
+    pageWorker.port.on("badge", function(pair) {
       setBadge(pair.value, pair.color);
     });
 
-    pageWorker.port.on('notificate', function(message) {
-      notification.notify({
-        title: 'Websocket',
-        text: message
-      });
+    pageWorker.port.on("notificate", function(message) {
+      notify(message);
     });
 
-    pageWorker.port.on('Reconnect', function(message) {
-      pageWorker.port.emit('init', fetchPrefs());
+    pageWorker.port.on("reconnect", function(message) {
+      pageWorker.port.emit("init", fetchPrefs());
     });
     
-    pageWorker.port.on('request', function(request) {
+    pageWorker.port.on("request", function(request) {
       var data = JSON.parse(request);
       var request = require("sdk/request").Request({
         url: data.url,
         headers: {
-          'User-Agent': data.agent,
-          'Referer': data.referer,
-          'Cookie': data.cookies
+          "User-Agent": data.agent,
+          "Referer": data.referer,
+          "Cookie": data.cookies
         },
         content: data.query,
         anonymous: true,
         onComplete: function(response) {
           var responseData = {
-            cookies: response.headers['Set-Cookie'],
-            type: response.headers['Content-Type'],
+            cookies: response.headers["Set-Cookie"],
+            type: response.headers["Content-Type"],
             text: response.text,
             reply_to: data.reply_to
           };
           var responseJson = JSON.stringify(responseData);
-          pageWorker.port.emit('response', responseJson);
+          pageWorker.port.emit("response", responseJson);
         }
       });
       switch (data.method) {
-        case 'GET':
+        case "GET":
           request.get();
           break;
-        case 'POST':
+        case "POST":
           request.post();
           break;
-        case 'PUT':
+        case "PUT":
           request.put();
           break;
-        case 'DELETE':
+        case "DELETE":
           request.delete();
           break;
-        case 'HEAD':
+        case "HEAD":
           request.head();
           break;
       }
     });
   }
   else {
-    wsState = 'off';
-    buttonPanel.port.emit('wsStateIs', 'off');
+    wsState = "off";
+    buttonPanel.port.emit("wsStateIs", "off");
     pageWorker.destroy();
-    notification.notify({
-      title: 'Websocket',
-      text: "Locally closed"
-    });
-    setBadge('', '');
+    notify("Locally closed");
+    setBadge("", "");
   }
 }
 
-prefsPanel.port.on('close', function(msg) {
+prefsPanel.port.on("close", function(msg) {
   prefsPanel.hide();
 });
 
-prefsPanel.port.on('saveprefs', function(prefs) {
+prefsPanel.port.on("saveprefs", function(prefs) {
   preferences.prefs["Websocket-address"] = prefs.wsaddress;
   preferences.prefs["E-mail"] = prefs.email;
   preferences.prefs["Password"] = prefs.password;
@@ -167,16 +158,16 @@ prefsPanel.port.on('saveprefs', function(prefs) {
   preferences.prefs["Reconnection timeout"] = prefs.timeout;
 });
 
-buttonPanel.port.on('pluginMenuClick', function(title) {
+buttonPanel.port.on("pluginMenuClick", function(title) {
   switch (title) {
-    case 'ws':
+    case "ws":
       wsSwitch();
       break;
-    case 'proxy':
+    case "proxy":
       switchProxyState();
       break;
-    case 'prefs':
-      prefsPanel.port.emit('setprefs', fetchPrefs());
+    case "prefs":
+      prefsPanel.port.emit("setprefs", fetchPrefs());
       prefsPanel.show();
       break;
   }
@@ -184,45 +175,35 @@ buttonPanel.port.on('pluginMenuClick', function(title) {
 
 function switchProxyState(){
   let proxyaddress = fetchPrefs().proxyaddress;
-  if (proxyaddress === '') {
-    notification.notify({
-      title: 'Websocket',
-      text: 'Proxy address is empty'
-    });
+  if (proxyaddress === "") {
+    notify("Proxy address is empty");
     return;    
   }
   else{
-    proxyIp = proxyaddress.replace('http://', '').split(':')[0];
-    proxyPort = parseInt(proxyaddress.replace('http://', '').split(':')[1], 10);
+    proxyIp = proxyaddress.replace("http://", "").split(":")[0];
+    proxyPort = parseInt(proxyaddress.replace("http://", "").split(":")[1], 10);
   }
-  if (proxyState != 'on') {
-    storage.proxyState = 'on';
-    proxyState = 'on';
-    buttonPanel.port.emit('proxyStateIs', 'on');
-    setBadge('p', '#0000EE');
+  if (proxyState != "on") {
+    storage.proxyState = "on";
+    proxyState = "on";
+    buttonPanel.port.emit("proxyStateIs", "on");
+    setBadge("p", "#0000EE");
     saveCurrentBrowserSettings();
-    setConfig('network.proxy.type', 1);
-    setConfig('network.proxy.http', proxyIp);
-    setConfig('network.proxy.http_port', proxyPort);
-    setConfig('network.proxy.no_proxies_on', 'localhost, 127.0.0.1');
+    setConfig("network.proxy.type", 1);
+    setConfig("network.proxy.http", proxyIp);
+    setConfig("network.proxy.http_port", proxyPort);
+    setConfig("network.proxy.no_proxies_on", "localhost, 127.0.0.1");
   }
   else {
-    storage.proxyState = 'off';
-    proxyState = 'off';
-    buttonPanel.port.emit('proxyStateIs', 'off');
-    setBadge('', '');
+    storage.proxyState = "off";
+    proxyState = "off";
+    buttonPanel.port.emit("proxyStateIs", "off");
+    setBadge("", "");
     if (typeof storage.old == "undefined" || isEmpty(storage.old)) {
-      browserConfig.reset('network.proxy.type');
-      browserConfig.reset('network.proxy.http');
-      browserConfig.reset('network.proxy.http_port');
-      browserConfig.reset('network.proxy.no_proxies_on');
+      resetBrowserSettings();
     }
     else {
-      setConfig('network.proxy.type', storage.old.type);
-      setConfig('network.proxy.http', storage.old.http);
-      setConfig('network.proxy.http_port', storage.old.port);
-      setConfig('network.proxy.no_proxies_on', storage.old.no);
-      delete storage.old;      
+      restoreOldBrowserSettings();
     }
   }
 }
@@ -245,6 +226,21 @@ function saveCurrentBrowserSettings() {
   }
 }
 
+function restoreOldBrowserSettings() {
+  setConfig("network.proxy.type", storage.old.type);
+  setConfig("network.proxy.http", storage.old.http);
+  setConfig("network.proxy.http_port", storage.old.port);
+  setConfig("network.proxy.no_proxies_on", storage.old.no);
+  delete storage.old;
+}
+
+function resetBrowserSettings() {
+  browserConfig.reset("network.proxy.type");
+  browserConfig.reset("network.proxy.http");
+  browserConfig.reset("network.proxy.http_port");
+  browserConfig.reset("network.proxy.no_proxies_on");
+}
+
 function isEmpty(obj) {
   for (let prop in obj) { 
     if (obj.hasOwnProperty(prop)) { 
@@ -252,4 +248,11 @@ function isEmpty(obj) {
     }
   }
   return true;
+}
+
+function notify(message) {
+  notification.notify({
+    title: 'Websocket',
+    text: message
+  });
 }

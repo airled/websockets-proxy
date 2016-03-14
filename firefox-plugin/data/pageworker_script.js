@@ -20,7 +20,7 @@ self.port.on('init', function(init_params) {
       timeout = 10;
     }
     self.port.emit('notificate', "Remotelly closed\nReconnection in " + timeout + " sec");
-    setTimeout("self.port.emit('Reconnect', '');", timeout * 1000);
+    setTimeout("self.port.emit('reconnect', '');", timeout * 1000);
     self.port.emit('badge', {value: 'w', color: '#EE0000'});
   };
 
