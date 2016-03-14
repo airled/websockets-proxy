@@ -2,9 +2,11 @@ var notification = require("sdk/notifications"),
     { ToggleButton } = require("sdk/ui/button/toggle"),
     panels = require("sdk/panel"),
     preferences = require('sdk/simple-prefs'),
+    storage = require("sdk/simple-storage"),
     self = require("sdk/self");
 
 var wsState = 'off';
+var proxyState = storage.proxyState;
 
 var button = ToggleButton({
   id: "bproxy",
@@ -163,7 +165,10 @@ buttonPanel.port.on('pluginMenuClick', function(title) {
       wsSwitch();
       break;
     case 'proxy':
-      console.log('works');
+      switchProxyValues();
+      console.log(proxyState);
+      // proxyState = 'on';
+      // console.log('works');
       break;
     case 'prefs':
       prefsPanel.port.emit('setprefs', fetchPrefs());
@@ -171,3 +176,27 @@ buttonPanel.port.on('pluginMenuClick', function(title) {
       break;
   }
 });
+
+function switchProxyValues() {
+  // let proxyPrefs = getProxyPrefs();
+  // if (proxyPrefs.proxyAddress === '' || proxyPrefs.proxyPort === '') {
+  //   notification.notify({
+  //     title: 'Websocket',
+  //     text: 'Some fields are empty'
+  //   });
+  //   return;    
+  // }
+  if (proxyState != 'on') {
+    proxyState = 'on';
+    // network.proxy.type = 1;
+    // network.proxy.socks = '';
+    // network.proxy.socks_port = 0;
+    // network.proxy.socks_remote_dns = false;
+    // network.proxy.no_proxies_on = 'localhost, 127.0.0.1';
+    // network.proxy.ssl = '';
+    // network.proxy.ssl_port = 0;
+  }
+  else {
+    proxyState = 'off';
+  }
+}
