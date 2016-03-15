@@ -15,8 +15,8 @@
   ],
   "preferences": [
     {
-      "name": "Websocket-address",
-      "title": "Websocket-address",
+      "name": "Websocket address",
+      "title": "Websocket address",
       "type": "string",
       "value": "ws://51.254.10.211:8080"
     },

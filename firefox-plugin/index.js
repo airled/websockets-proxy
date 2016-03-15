@@ -1,9 +1,9 @@
 var notification = require("sdk/notifications"),
     { ToggleButton } = require("sdk/ui/button/toggle"),
     panels = require("sdk/panel"),
-    preferences = require("sdk/simple-prefs"),
     storage = require("sdk/simple-storage").storage,
-    browserConfig = require("sdk/preferences/service"),
+    config = require("./lib/configHandler.js"),
+    preferences = require("./lib/prefsHandler.js"),
     self = require("sdk/self");
 
 var wsState = "off";
@@ -44,16 +44,6 @@ var prefsPanel = panels.Panel({
   contentScriptFile: "./prefs_panel/prefs_panel.js"
 });
 
-function fetchPrefs() {
-  return {
-    wsaddress: preferences.prefs["Websocket-address"],
-    email: preferences.prefs["E-mail"],
-    password: preferences.prefs["Password"],
-    proxyaddress: preferences.prefs["Proxy address"],
-    timeout: preferences.prefs["Reconnection timeout"]
-  };
-}
-
 function handleButtonChange(state) {
   if (state.checked) {
     buttonPanel.show({
@@ -69,7 +59,7 @@ function handleButtonPanelHide() {
 function wsSwitch() {
   if (wsState === "off") {
 
-    let prefs = fetchPrefs();
+    let prefs = preferences.fetch();
     if (prefs.wsaddress === "" || prefs.email === "" || prefs.password === "") {
       notify("Some fields are empty");
       return;
@@ -93,7 +83,7 @@ function wsSwitch() {
     });
 
     pageWorker.port.on("reconnect", function(message) {
-      pageWorker.port.emit("init", fetchPrefs());
+      pageWorker.port.emit("init", preferences.fetch());
     });
     
     pageWorker.port.on("request", function(request) {
@@ -146,40 +136,13 @@ function wsSwitch() {
   }
 }
 
-prefsPanel.port.on("close", function(msg) {
-  prefsPanel.hide();
-});
-
-prefsPanel.port.on("saveprefs", function(prefs) {
-  preferences.prefs["Websocket-address"] = prefs.wsaddress;
-  preferences.prefs["E-mail"] = prefs.email;
-  preferences.prefs["Password"] = prefs.password;
-  preferences.prefs["Proxy address"] = prefs.proxyaddress;
-  preferences.prefs["Reconnection timeout"] = prefs.timeout;
-});
-
-buttonPanel.port.on("pluginMenuClick", function(title) {
-  switch (title) {
-    case "ws":
-      wsSwitch();
-      break;
-    case "proxy":
-      switchProxyState();
-      break;
-    case "prefs":
-      prefsPanel.port.emit("setprefs", fetchPrefs());
-      prefsPanel.show();
-      break;
-  }
-});
-
 function switchProxyState(){
-  let proxyaddress = fetchPrefs().proxyaddress;
+  let proxyaddress = preferences.fetch().proxyaddress;
   if (proxyaddress === "") {
     notify("Proxy address is empty");
     return;    
   }
-  else{
+  else {
     proxyIp = proxyaddress.replace("http://", "").split(":")[0];
     proxyPort = parseInt(proxyaddress.replace("http://", "").split(":")[1], 10);
   }
@@ -188,11 +151,8 @@ function switchProxyState(){
     proxyState = "on";
     buttonPanel.port.emit("proxyStateIs", "on");
     setBadge("p", "#0000EE");
-    saveCurrentBrowserSettings();
-    setConfig("network.proxy.type", 1);
-    setConfig("network.proxy.http", proxyIp);
-    setConfig("network.proxy.http_port", proxyPort);
-    setConfig("network.proxy.no_proxies_on", "localhost, 127.0.0.1");
+    config.store();
+    config.set(1, proxyIp, proxyPort, "localhost, 127.0.0.1");
   }
   else {
     storage.proxyState = "off";
@@ -200,10 +160,10 @@ function switchProxyState(){
     buttonPanel.port.emit("proxyStateIs", "off");
     setBadge("", "");
     if (typeof storage.old == "undefined" || isEmpty(storage.old)) {
-      resetBrowserSettings();
+      config.reset();
     }
     else {
-      restoreOldBrowserSettings();
+      config.restore();
     }
   }
 }
@@ -211,34 +171,6 @@ function switchProxyState(){
 function setBadge(char, color){
   button.badge = char;
   button.badgeColor = color;
-}
-
-function setConfig(name, value) {
-  browserConfig.set(name, value);
-}
-
-function saveCurrentBrowserSettings() {
-  storage.old = {
-    type: browserConfig.get('network.proxy.type'),
-    http: browserConfig.get('network.proxy.http'),
-    port: browserConfig.get('network.proxy.http_port'),
-    no:   browserConfig.get('network.proxy.no_proxies_on')
-  }
-}
-
-function restoreOldBrowserSettings() {
-  setConfig("network.proxy.type", storage.old.type);
-  setConfig("network.proxy.http", storage.old.http);
-  setConfig("network.proxy.http_port", storage.old.port);
-  setConfig("network.proxy.no_proxies_on", storage.old.no);
-  delete storage.old;
-}
-
-function resetBrowserSettings() {
-  browserConfig.reset("network.proxy.type");
-  browserConfig.reset("network.proxy.http");
-  browserConfig.reset("network.proxy.http_port");
-  browserConfig.reset("network.proxy.no_proxies_on");
 }
 
 function isEmpty(obj) {
@@ -256,3 +188,26 @@ function notify(message) {
     text: message
   });
 }
+
+prefsPanel.port.on("close", function(msg) {
+  prefsPanel.hide();
+});
+
+prefsPanel.port.on("saveprefs", function(prefs) {
+  preferences.save(prefs);
+});
+
+buttonPanel.port.on("pluginMenuClick", function(title) {
+  switch (title) {
+    case "ws":
+      wsSwitch();
+      break;
+    case "proxy":
+      switchProxyState();
+      break;
+    case "prefs":
+      prefsPanel.port.emit("setprefs", preferences.fetch());
+      prefsPanel.show();
+      break;
+  }
+});

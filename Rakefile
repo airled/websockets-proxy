@@ -27,6 +27,10 @@ task :plugin do
   system 'cd ./firefox-plugin && jpm run -b /usr/bin/firefox'
 end
 
+task :ptest do
+  system '(cd firefox-plugin && jpm -b /usr/bin/firefox test)'
+end
+
 task :x do
   system 'cd ./firefox-plugin && jpm xpi'
 end
