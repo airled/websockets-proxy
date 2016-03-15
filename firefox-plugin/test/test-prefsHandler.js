@@ -24,11 +24,11 @@ exports["test save preferences"] = function(assert) {
     timeout: "100",
   };
   handler.save(prefs);
-  assert.ok(preferences.prefs["Websocket address"] = "ws://testeme.me:4321");
-  assert.ok(preferences.prefs["E-mail"] = "em@il.li");
-  assert.ok(preferences.prefs["Password"] = "verifyme");
-  assert.ok(preferences.prefs["Proxy address"] = "http://thereisno.spoon:9876");
-  assert.ok(preferences.prefs["Reconnection timeout"] = "100");
+  assert.ok(preferences.prefs["Websocket address"] === "ws://testeme.me:4321");
+  assert.ok(preferences.prefs["E-mail"] === "em@il.li");
+  assert.ok(preferences.prefs["Password"] === "verifyme");
+  assert.ok(preferences.prefs["Proxy address"] === "http://thereisno.spoon:9876");
+  assert.ok(preferences.prefs["Reconnection timeout"] === "100");
 }
 
 require("sdk/test").run(exports);
