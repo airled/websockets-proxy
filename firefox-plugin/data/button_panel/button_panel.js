@@ -1,28 +1,23 @@
-window.addEventListener('click', function(event) {
-  self.port.emit('pluginMenuClick', event.target.getAttribute('title').toString());
+window.addEventListener("click", function(event) {
+  self.port.emit("pluginMenuClick", event.target.getAttribute("title").toString());
 }, false);
 
-var wsDiv = document.getElementById('ws');
-var proxyDiv = document.getElementById('proxy');
+var wsDiv = document.getElementById("ws");
+var proxyDiv = document.getElementById("proxy");
 
-self.port.on('wsStateIs', function(msg) {
+self.port.on("changeMenu", function(msg) {
   switch (msg) {
-    case 'on':
-      wsDiv.innerHTML = 'Закрыть websocket';
+    case "wsIsOn":
+      wsDiv.innerHTML = "Закрыть websocket";
       break;
-    case 'off':
-      wsDiv.innerHTML = 'Открыть websocket';
+    case "wsIsOff":
+      wsDiv.innerHTML = "Открыть websocket";
       break;
-  }
-});
-
-self.port.on('proxyStateIs', function(msg) {
-  switch (msg) {
-    case 'on':
-      proxyDiv.innerHTML = 'Выключить прокси';
+    case "proxyIsOn":
+      proxyDiv.innerHTML = "Выключить прокси";
       break;
-    case 'off':
-      proxyDiv.innerHTML = 'Включить прокси';
+    case "proxyIsOff":
+      proxyDiv.innerHTML = "Включить прокси";
       break;
   }
 });

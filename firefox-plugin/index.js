@@ -31,10 +31,10 @@ var buttonPanel = panels.Panel({
 
 if (proxyState === "on") {
   setBadge("p", "#0000EE");
-  buttonPanel.port.emit("proxyStateIs", "on");
+  buttonPanel.port.emit("changeMenu", "proxyIsOn");
 }
 else {
-  buttonPanel.port.emit("proxyStateIs", "off");
+  buttonPanel.port.emit("changeMenu", "proxyIsOff");
 }
 
 var prefsPanel = panels.Panel({
@@ -67,7 +67,7 @@ function wsSwitch() {
 
     wsState = "on";
 
-    buttonPanel.port.emit("wsStateIs", "on");
+    buttonPanel.port.emit("changeMenu", "wsIsOn");
     pageWorker = require("sdk/page-worker").Page({
       contentScriptFile: "./pageworker_script.js"
     });
@@ -129,14 +129,14 @@ function wsSwitch() {
   }
   else {
     wsState = "off";
-    buttonPanel.port.emit("wsStateIs", "off");
+    buttonPanel.port.emit("changeMenu", "wsIsOff");
     pageWorker.destroy();
     notify("Locally closed");
     setBadge("", "");
   }
 }
 
-function switchProxyState(){
+function switchProxyState() {
   let proxyaddress = preferences.fetch().proxyaddress;
   if (proxyaddress === "") {
     notify("Proxy address is empty");
@@ -149,7 +149,7 @@ function switchProxyState(){
   if (proxyState != "on") {
     storage.proxyState = "on";
     proxyState = "on";
-    buttonPanel.port.emit("proxyStateIs", "on");
+    buttonPanel.port.emit("changeMenu", "proxyIsOn");
     setBadge("p", "#0000EE");
     config.store();
     config.set(1, proxyIp, proxyPort, "localhost, 127.0.0.1");
@@ -157,7 +157,7 @@ function switchProxyState(){
   else {
     storage.proxyState = "off";
     proxyState = "off";
-    buttonPanel.port.emit("proxyStateIs", "off");
+    buttonPanel.port.emit("changeMenu", "proxyIsOff");
     setBadge("", "");
     if (typeof storage.old == "undefined" || isEmpty(storage.old)) {
       config.reset();
@@ -168,7 +168,7 @@ function switchProxyState(){
   }
 }
 
-function setBadge(char, color){
+function setBadge(char, color) {
   button.badge = char;
   button.badgeColor = color;
 }
@@ -184,7 +184,7 @@ function isEmpty(obj) {
 
 function notify(message) {
   notification.notify({
-    title: 'Websocket',
+    title: "Websocket",
     text: message
   });
 }
@@ -211,3 +211,5 @@ buttonPanel.port.on("pluginMenuClick", function(title) {
       break;
   }
 });
+
+exports.isEmpty = isEmpty;
