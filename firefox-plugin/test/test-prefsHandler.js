@@ -21,7 +21,7 @@ exports["test save preferences"] = function(assert) {
     email: "em@il.li",
     password: "verifyme",
     proxyaddress: "http://thereisno.spoon:9876",
-    timeout: "100",
+    timeout: "100"
   };
   handler.save(prefs);
   assert.ok(preferences.prefs["Websocket address"] === "ws://testeme.me:4321");

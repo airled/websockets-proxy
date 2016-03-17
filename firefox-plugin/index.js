@@ -152,7 +152,7 @@ function switchProxyState() {
     buttonPanel.port.emit("changeMenu", "proxyIsOn");
     setBadge("p", "#0000EE");
     config.store();
-    config.set(1, proxyIp, proxyPort, "localhost, 127.0.0.1");
+    config.set(proxyIp, proxyPort);
   }
   else {
     storage.proxyState = "off";
