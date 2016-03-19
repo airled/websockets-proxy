@@ -1,13 +1,15 @@
-var notification = require("sdk/notifications"),
+var helper = require("./lib/helper.js"),
     { ToggleButton } = require("sdk/ui/button/toggle"),
     panels = require("sdk/panel"),
     storage = require("sdk/simple-storage").storage,
     config = require("./lib/configHandler.js"),
     preferences = require("./lib/prefsHandler.js"),
-    self = require("sdk/self");
+    observer = require("./lib/httpObserver.js"),
+    authenticator = require("./lib/httpAuthenticator.js");
 
 var wsState = "off";
 var proxyState = storage.proxyState;
+var queueHeaderState = "off";
 
 var button = ToggleButton({
   id: "bproxy",
@@ -24,23 +26,24 @@ var button = ToggleButton({
 var buttonPanel = panels.Panel({
   width: 170,
   height: 70,
-  contentURL: self.data.url("button_panel/button_panel.html"),
+  contentURL: "./button_panel/button_panel.html",
   contentScriptFile: "./button_panel/button_panel.js",
   onHide: handleButtonPanelHide
 });
 
 if (proxyState === "on") {
-  setBadge("p", "#0000EE");
+  setBadge("p", "#EEEE00");
   buttonPanel.port.emit("changeMenu", "proxyIsOn");
+  authenticator.authenticate(preferences.fetch().email, preferences.fetch().password);
 }
 else {
   buttonPanel.port.emit("changeMenu", "proxyIsOff");
 }
 
 var prefsPanel = panels.Panel({
-  width: 340,
-  height: 275,
-  contentURL: self.data.url("prefs_panel/prefs_panel.html"),
+  width: 280,
+  height: 340,
+  contentURL: "./prefs_panel/prefs_panel.html",
   contentScriptFile: "./prefs_panel/prefs_panel.js"
 });
 
@@ -61,7 +64,7 @@ function wsSwitch() {
 
     let prefs = preferences.fetch();
     if (prefs.wsaddress === "" || prefs.email === "" || prefs.password === "") {
-      notify("Some fields are empty");
+      helper.notify("Some fields are empty");
       return;
     }
 
@@ -79,7 +82,7 @@ function wsSwitch() {
     });
 
     pageWorker.port.on("notificate", function(message) {
-      notify(message);
+      helper.notify(message);
     });
 
     pageWorker.port.on("reconnect", function(message) {
@@ -131,15 +134,18 @@ function wsSwitch() {
     wsState = "off";
     buttonPanel.port.emit("changeMenu", "wsIsOff");
     pageWorker.destroy();
-    notify("Locally closed");
+    helper.notify("Locally closed");
     setBadge("", "");
   }
 }
 
+
 function switchProxyState() {
-  let proxyaddress = preferences.fetch().proxyaddress;
-  if (proxyaddress === "") {
-    notify("Proxy address is empty");
+  let email = preferences.fetch().email,
+      password = preferences.fetch().password,
+      proxyaddress = preferences.fetch().proxyaddress;
+  if (email === '' || password === '' || proxyaddress === "") {
+    helper.notify("Some prefs fields are empty");
     return;    
   }
   else {
@@ -147,19 +153,23 @@ function switchProxyState() {
     proxyPort = parseInt(proxyaddress.replace("http://", "").split(":")[1], 10);
   }
   if (proxyState != "on") {
+    setBadge("p", "#EEEE00");
+    authenticator.authenticate(email, password);
     storage.proxyState = "on";
     proxyState = "on";
     buttonPanel.port.emit("changeMenu", "proxyIsOn");
-    setBadge("p", "#0000EE");
     config.store();
     config.set(proxyIp, proxyPort);
   }
   else {
     storage.proxyState = "off";
     proxyState = "off";
+    if (queueHeaderState === "on") {
+      observer.unregister();
+    }
     buttonPanel.port.emit("changeMenu", "proxyIsOff");
     setBadge("", "");
-    if (typeof storage.old == "undefined" || isEmpty(storage.old)) {
+    if (typeof storage.old == "undefined" || helper.checkEmpty(storage.old)) {
       config.reset();
     }
     else {
@@ -173,20 +183,8 @@ function setBadge(char, color) {
   button.badgeColor = color;
 }
 
-function isEmpty(obj) {
-  for (let prop in obj) { 
-    if (obj.hasOwnProperty(prop)) { 
-      return false;
-    }
-  }
-  return true;
-}
-
-function notify(message) {
-  notification.notify({
-    title: "Websocket",
-    text: message
-  });
+function setQueueHeaderState(value) {
+  queueHeaderState = value;
 }
 
 prefsPanel.port.on("close", function(msg) {
@@ -212,4 +210,5 @@ buttonPanel.port.on("pluginMenuClick", function(title) {
   }
 });
 
-exports.isEmpty = isEmpty;
+exports.setBadge = setBadge;
+exports.setQueueHeaderState = setQueueHeaderState;

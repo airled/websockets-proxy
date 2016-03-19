@@ -3,6 +3,7 @@ require 'sinatra-websocket'
 require_relative '../config/initializer'
 
 set :server, 'thin'
+set :bind, '127.0.0.1'
 set :port, 3101
 
 portlist = Portlist.new

@@ -11,8 +11,11 @@
 		.inline{
 			display: inline-block;
 		}
+		#timeout{
+			width: 80px;
+		}
 		#profile{
-			width: 90px;
+			width: 110px;
 		}
 		#buttonWrapper{
 			float: right;
@@ -22,14 +25,24 @@
 <body>
 	<form action="#">
 		<fieldset>
-	        <legend>Настройки websocket</legend>
-			<input type="text" id="wsaddress" name="wsaddress" placeholder="Адрес websocket">Адреc
-			<input type="email" id="email" name="email" placeholder="Email">Email
-			<input type="password" id="password" name="password" placeholder="Пароль">Пароль
+	        <legend>Email</legend>
+			<input type="email" id="email" name="email" placeholder="Email">
 		</fieldset>
 		<fieldset>
-	        <legend>Настройки прокси</legend>
-			<input type="text" id="proxyaddress" name="proxyaddress" placeholder="Адрес proxy">Адрес
+	        <legend>Пароль</legend>
+			<input type="password" id="password" name="password" placeholder="Пароль">
+		</fieldset>
+		<fieldset>
+	        <legend>Адрес websocket</legend>
+			<input type="text" id="wsaddress" name="wsaddress" placeholder="Адрес websocket">
+		</fieldset>
+		<fieldset>
+	        <legend>Адрес proxy</legend>
+			<input type="text" id="proxyaddress" name="proxyaddress" placeholder="Адрес proxy">
+		</fieldset>
+		<fieldset class="inline">
+			<legend>Таймаут</legend>
+			<input type="number" min="10" id="timeout" name="timeout" placeholder="Таймаут"> с
 		</fieldset>
 		<fieldset class="inline" id="profile">
 			<legend>Профиль</legend>
@@ -37,10 +50,6 @@
 				<option value="Test1">Тест1</option>
 				<option value="Test2">Тест2</option>
 			</select>
-		</fieldset>
-		<fieldset class="inline">
-			<legend>Таймаут реконнекта</legend>
-			<input type="number" min="10" id="timeout" name="timeout" placeholder="Таймаут"> с
 		</fieldset>
 		<div id="buttonWrapper">
 			<input type="reset" value="Сброс">
