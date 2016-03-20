@@ -152,7 +152,7 @@ function switchProxyState() {
     proxyIp = proxyaddress.replace("http://", "").split(":")[0];
     proxyPort = parseInt(proxyaddress.replace("http://", "").split(":")[1], 10);
   }
-  if (proxyState != "on") {
+  if (proxyState !== "on") {
     setBadge("p", "#EEEE00");
     authenticator.authenticate(email, password);
     storage.proxyState = "on";

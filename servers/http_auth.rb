@@ -1,5 +1,4 @@
 require 'sinatra'
-require 'bcrypt'
 require 'json'
 require_relative '../models/account_model'
 
@@ -8,7 +7,6 @@ set :bind, '127.0.0.1'
 set :port, 3103
 
 post '/auth' do
-  p request
   if !params.has_key?('email') ||
      !params.has_key?('password') ||
      Account[email: params['email']].nil? ||
