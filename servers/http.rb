@@ -33,7 +33,7 @@ route :get, :post, :put, :delete, :head, '/*' do
   elsif !portlist.include?(personal_port)
     status 404
     body 'No websocket for this port'
-  elsif !portlist.has_queue?(personal_port, personal_queue)
+  elsif !portlist.queue_for_port?(personal_queue, personal_port)
     status 403
     body 'Invalid request data'
   else

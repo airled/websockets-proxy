@@ -24,7 +24,7 @@ class Portlist
     !@portlist.get(port).nil?
   end
 
-  def has_queue?(port, queue)
+  def queue_for_port?(queue, port)
     @portlist.get(port) == queue
   end
 

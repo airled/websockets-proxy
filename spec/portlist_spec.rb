@@ -26,6 +26,12 @@ describe 'Portlist' do
     expect(@portlist.clear).to eql('OK')
   end
 
+  it 'should find out if queue name is bound up with port' do
+    @portlist.bind('10000', 'testqueue')
+    expect(@portlist.queue_for_port?('testqueue', '10000')).to eql(true)
+    expect(@portlist.queue_for_port?('testqueue1', '10000')).to eql(false)
+  end
+
   after(:all) do
     @portlist.clear
   end
