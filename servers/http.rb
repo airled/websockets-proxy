@@ -4,7 +4,7 @@ require_relative '../config/initializer'
 
 set :server, 'thin'
 set :bind, '127.0.0.1'
-set :port, 3102
+set :port, 3103
 
 portlist = Portlist.new
 
@@ -23,9 +23,9 @@ def get_request_data(request_env)
 end
 
 route :get, :post, :put, :delete, :head, '/*' do
-  personal_port = '3102'
+  # personal_port = '3102'
   # personal_queue = '20bb1dded7add8a6fb'
-  # personal_port = request.env['HTTP_PERSONALPORT']
+  personal_port = request.env['HTTP_PERSONALPORT']
   personal_queue = request.env['HTTP_PERSONALQUEUE']
   if personal_port.nil? || personal_queue.nil?
     status 403

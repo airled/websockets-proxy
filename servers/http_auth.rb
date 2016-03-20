@@ -4,9 +4,10 @@ require_relative '../models/account_model'
 
 set :server, 'thin'
 set :bind, '127.0.0.1'
-set :port, 3103
+set :port, 3102
 
 post '/auth' do
+  content_type :json
   if !params.has_key?('email') ||
      !params.has_key?('password') ||
      Account[email: params['email']].nil? ||
