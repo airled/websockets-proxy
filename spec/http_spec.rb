@@ -82,6 +82,35 @@ describe "HTTP server" do
     })
   end
 
+  it "return result" do
+    connection = Bunny.new
+    connection.start
+    channel = connection.create_channel
+    exchange = channel.default_exchange
+    queue = channel.queue(@account.queue)
+    queue.subscribe do |delivery_info, metadata, payload|
+      reply_to = JSON.parse(payload)['reply_to']
+      response = {'type' => 'text/html', 'cookies' => 'testcookies', 'text' => 'testtext'}.to_json
+      exchange.publish(response, routing_key: reply_to)
+    end
+    @portlist.bind(@account.port, @account.queue)
+    get '/', {}, {
+      'HTTP_PERSONALPORT' => 234567,
+      'HTTP_PERSONALQUEUE' => '111',
+      'HTTP_HOST' => 'hiimhost',
+      'REQUEST_URI' => '/testuri',
+      'rack.request.form_vars' => 'foo=bar',
+      'HTTP_COOKIE' => 'testcookie=testvalue',
+      'HTTP_USER_AGENT' => 'testuseragent',
+      'HTTP_REFERER' => 'testreferer'
+    }
+    expect(last_response.status).to eq(200)
+    expect(last_response.content_type).to eq('text/html;charset=utf-8')
+    expect(last_response.headers['Set-Cookie']).to eq('testcookies')
+    expect(last_response.body).to eq('testtext')
+    connection.close
+  end
+
   after(:all) do
     @account.destroy
     @portlist.clear

@@ -43,7 +43,7 @@ describe 'Auth HTTP server' do
     expect(JSON.parse(last_response.body)['result']).to eql('failed')
   end
 
-  it 'should return "failed" if there is the password is wrong' do
+  it 'should return "failed" if the password is wrong' do
     post '/auth', email: 'abc@abc.abc', password: '12345678900'
     expect(last_response.status).to eql(200)
     expect(last_response.content_type).to eql('application/json')
