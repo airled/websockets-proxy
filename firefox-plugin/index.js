@@ -93,22 +93,20 @@ function wsSwitch() {
       var data = JSON.parse(request);
       var request = require("sdk/request").Request({
         url: data.url,
-        headers: {
-          "User-Agent": data.agent,
-          "Referer": data.referer,
-          "Cookie": data.cookies
-        },
-        content: data.query,
+        headers: data.headers,
+        content: data.params,
         anonymous: true,
         onComplete: function(response) {
-          var responseData = {
-            cookies: response.headers["Set-Cookie"],
-            type: response.headers["Content-Type"],
-            text: response.text,
-            reply_to: data.reply_to
+          responseHeaders = response.headers;
+          delete responseHeaders["Transfer-Encoding"];
+          delete responseHeaders["Content-Encoding"];
+          let responseData = {
+            reply_to: data.reply_to,
+            status: response.status,
+            headers: responseHeaders,
+            body: response.text
           };
-          var responseJson = JSON.stringify(responseData);
-          pageWorker.port.emit("response", responseJson);
+          pageWorker.port.emit("response", JSON.stringify(responseData));
         }
       });
       switch (data.method) {
@@ -138,7 +136,6 @@ function wsSwitch() {
     setBadge("", "");
   }
 }
-
 
 function switchProxyState() {
   let email = preferences.fetch().email,

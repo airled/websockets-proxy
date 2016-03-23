@@ -5,6 +5,7 @@ var main = require("../index.js"),
 
 function authenticate(email, password) {
   var request = require("sdk/request").Request({
+    // url: "http://127.0.0.1:3102/auth",
     url: "http://51.254.10.211:8081/auth",
     content: {
       'email': email,

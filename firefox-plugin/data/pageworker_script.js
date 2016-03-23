@@ -5,6 +5,10 @@ self.port.on('init', function(init_params) {
       password = init_params.password,
       timeout = init_params.timeout;
 
+  if (wsaddress.slice(0,5) !== 'ws://') {
+    wsaddress = 'ws://' + wsaddress;
+  }
+
   self.port.emit('notificate', 'Connecting ' + wsaddress);
       
   var ws = new WebSocket(wsaddress);

@@ -60,7 +60,7 @@ describe "HTTP server" do
     expect(last_response.body).to eq('Invalid request data')
   end
 
-  it "should got request data" do
+  it "should got proper request data" do
     testenv = {
       'HTTP_PERSONALPORT' => 234567,
       'HTTP_PERSONALQUEUE' => '111',
@@ -70,19 +70,79 @@ describe "HTTP server" do
       'rack.request.form_vars' => 'foo=bar',
       'HTTP_COOKIE' => 'testcookie=testvalue',
       'HTTP_USER_AGENT' => 'testuseragent',
-      'HTTP_REFERER' => 'testreferer'
+      'HTTP_REFERER' => 'testreferer',
+      'HTTP_ACCEPT' => 'testaccept',
+      'HTTP_ACCEPT_LANGUAGE' => 'testrru'
     }
     expect(get_request_data(testenv)).to eq({
       url: 'http://hiimhost/testuri',
       method: 'testmethod',
-      query: 'foo=bar',
-      cookies: 'testcookie=testvalue',
-      agent: 'testuseragent',
-      referer: 'testreferer'
+      params: 'foo=bar',
+      headers: {
+        'Cookie' => 'testcookie=testvalue',
+        'User-Agent' => 'testuseragent',
+        'Referer' => 'testreferer',
+        'Accept' => 'testaccept',
+        'Accept-Language' => 'testrru' 
+      }
     })
   end
 
-  it "return result" do
+  it "should not include nil headers into request data" do
+    testenv = {
+      'HTTP_PERSONALPORT' => 234567,
+      'HTTP_PERSONALQUEUE' => '111',
+      'HTTP_HOST' => 'hiimhost',
+      'REQUEST_URI' => '/testuri',
+      'REQUEST_METHOD' => 'testmethod',
+      'rack.request.form_vars' => 'foo=bar',
+      'HTTP_COOKIE' => 'testcookie=testvalue',
+      'HTTP_USER_AGENT' => 'testuseragent',
+      'HTTP_REFERER' => nil,
+      'HTTP_ACCEPT' => 'testaccept',
+      'HTTP_ACCEPT_LANGUAGE' => 'testrru'
+    }
+    expect(get_request_data(testenv)).to eq({
+      url: 'http://hiimhost/testuri',
+      method: 'testmethod',
+      params: 'foo=bar',
+      headers: {
+        'Cookie' => 'testcookie=testvalue',
+        'User-Agent' => 'testuseragent',
+        'Accept' => 'testaccept',
+        'Accept-Language' => 'testrru' 
+      }
+    })
+  end
+
+  it "should not include nil params into request data" do
+    testenv = {
+      'HTTP_PERSONALPORT' => 234567,
+      'HTTP_PERSONALQUEUE' => '111',
+      'HTTP_HOST' => 'hiimhost',
+      'REQUEST_URI' => '/testuri',
+      'REQUEST_METHOD' => 'testmethod',
+      'rack.request.form_vars' => nil,
+      'HTTP_COOKIE' => 'testcookie=testvalue',
+      'HTTP_USER_AGENT' => 'testuseragent',
+      'HTTP_REFERER' => 'myreferer',
+      'HTTP_ACCEPT' => 'testaccept',
+      'HTTP_ACCEPT_LANGUAGE' => 'testrru'
+    }
+    expect(get_request_data(testenv)).to eq({
+      url: 'http://hiimhost/testuri',
+      method: 'testmethod',
+      headers: {
+        'Cookie' => 'testcookie=testvalue',
+        'User-Agent' => 'testuseragent',
+        'Accept' => 'testaccept',
+        'Accept-Language' => 'testrru' ,
+        'Referer' => 'myreferer'
+      }
+    })
+  end
+
+  it "return correct result" do
     connection = Bunny.new
     connection.start
     channel = connection.create_channel
@@ -90,23 +150,24 @@ describe "HTTP server" do
     queue = channel.queue(@account.queue)
     queue.subscribe do |delivery_info, metadata, payload|
       reply_to = JSON.parse(payload)['reply_to']
-      response = {'type' => 'text/html', 'cookies' => 'testcookies', 'text' => 'testtext'}.to_json
+      response = {
+        'status': 201,
+        'headers':{
+          'Content-Type' => 'text/html;',
+          'Set-Cookie' => 'test=cookies'
+        },
+        'body' => 'testtext'
+      }.to_json
       exchange.publish(response, routing_key: reply_to)
     end
     @portlist.bind(@account.port, @account.queue)
     get '/', {}, {
       'HTTP_PERSONALPORT' => 234567,
-      'HTTP_PERSONALQUEUE' => '111',
-      'HTTP_HOST' => 'hiimhost',
-      'REQUEST_URI' => '/testuri',
-      'rack.request.form_vars' => 'foo=bar',
-      'HTTP_COOKIE' => 'testcookie=testvalue',
-      'HTTP_USER_AGENT' => 'testuseragent',
-      'HTTP_REFERER' => 'testreferer'
+      'HTTP_PERSONALQUEUE' => '111'
     }
-    expect(last_response.status).to eq(200)
+    expect(last_response.status).to eq(201)
     expect(last_response.content_type).to eq('text/html;charset=utf-8')
-    expect(last_response.headers['Set-Cookie']).to eq('testcookies')
+    expect(last_response.headers['Set-Cookie']).to eq('test=cookies')
     expect(last_response.body).to eq('testtext')
     connection.close
   end

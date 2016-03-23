@@ -45,3 +45,9 @@ end
 task :dp do
   system 'scp firefox-plugin/@bproxy-0.2.0.xpi wsweb@51.254.10.211:/home/wsweb/current/public/'
 end
+
+task :test do
+  Rake::Task['ptest'].invoke
+  system 'rspec'
+end
+task :t => :test

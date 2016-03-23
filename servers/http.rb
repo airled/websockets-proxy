@@ -15,11 +15,15 @@ def get_request_data(request_env)
   {
     url: url,
     method: request_env['REQUEST_METHOD'],
-    query: request_env['rack.request.form_vars'],
-    cookies: request_env['HTTP_COOKIE'],
-    agent: request_env['HTTP_USER_AGENT'],
-    referer: request_env['HTTP_REFERER']
-  }
+    params: request_env['rack.request.form_vars'],
+    headers: {
+      'Cookie' => request_env['HTTP_COOKIE'],
+      'User-Agent' => request_env['HTTP_USER_AGENT'],
+      'Referer' => request_env['HTTP_REFERER'],
+      'Accept' => request_env['HTTP_ACCEPT'],
+      'Accept-Language' => request_env['HTTP_ACCEPT_LANGUAGE']
+    }.delete_if { |key, value| value == nil }
+  }.delete_if { |key, value| value == nil }
 end
 
 route :get, :post, :put, :delete, :head, '/*' do
@@ -55,10 +59,11 @@ route :get, :post, :put, :delete, :head, '/*' do
     end
     
     connection.close
-
-    content_type answer['type'].split(';')[0]
-    response.headers['Set-Cookie'] = answer['cookies'] if answer['cookies']
-    answer['text']
+    
+    status answer['status']
+    answer['headers'].each_pair { |header_name, header_value| response[header_name] = header_value }
+    content_type answer['headers']['Content-Type'].split(';')[0] if answer['headers']['Content-Type']
+    answer['body']
   end
 
 end
