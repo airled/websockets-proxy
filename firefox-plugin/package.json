@@ -43,6 +43,12 @@
       "title": "Reconnection timeout",
       "type": "string",
       "value": "10"
+    },
+    {
+      "name": "Profile",
+      "title": "Profile",
+      "type": "string",
+      "value": "default"
     }
   ]
 }

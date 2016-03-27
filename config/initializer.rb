@@ -1,5 +1,4 @@
 require 'bunny'
 require 'json'
-require_relative '../models/account_model'
-require_relative '../lib/portlist'
-
+require_relative './models'
+require_relative '../lib/queuelist'

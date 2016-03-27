@@ -34,7 +34,7 @@ var buttonPanel = panels.Panel({
 if (proxyState === "on") {
   setBadge("p", "#EEEE00");
   buttonPanel.port.emit("changeMenu", "proxyIsOn");
-  authenticator.authenticate(preferences.fetch().email, preferences.fetch().password);
+  authenticator.authenticate(preferences.fetch().email, preferences.fetch().password, preferences.fetch().profile);
 }
 else {
   buttonPanel.port.emit("changeMenu", "proxyIsOff");
@@ -63,8 +63,8 @@ function wsSwitch() {
   if (wsState === "off") {
 
     let prefs = preferences.fetch();
-    if (prefs.wsaddress === "" || prefs.email === "" || prefs.password === "") {
-      helper.notify("Some fields are empty");
+    if (prefs.wsaddress === "" || prefs.email === "" || prefs.password === "" || prefs.profile === "") {
+      helper.notify("Some preferences for websocket are empty");
       return;
     }
 
@@ -79,6 +79,10 @@ function wsSwitch() {
     
     pageWorker.port.on("badge", function(pair) {
       setBadge(pair.value, pair.color);
+    });
+
+    pageWorker.port.on("shutdown", function(message) {
+      wsSwitch();
     });
 
     pageWorker.port.on("notificate", function(message) {
@@ -138,20 +142,19 @@ function wsSwitch() {
 }
 
 function switchProxyState() {
-  let email = preferences.fetch().email,
-      password = preferences.fetch().password,
-      proxyaddress = preferences.fetch().proxyaddress;
-  if (email === '' || password === '' || proxyaddress === "") {
+
+  let prefs = preferences.fetch();
+  if (prefs.email === '' || prefs.password === '' || prefs.proxyaddress === "" || prefs.profile === "") {
     helper.notify("Some prefs fields are empty");
     return;    
   }
   else {
-    proxyIp = proxyaddress.replace("http://", "").split(":")[0];
-    proxyPort = parseInt(proxyaddress.replace("http://", "").split(":")[1], 10);
+    proxyIp = prefs.proxyaddress.replace("http://", "").split(":")[0];
+    proxyPort = parseInt(prefs.proxyaddress.replace("http://", "").split(":")[1], 10);
   }
   if (proxyState !== "on") {
     setBadge("p", "#EEEE00");
-    authenticator.authenticate(email, password);
+    authenticator.authenticate(prefs.email, prefs.password, prefs.profile);
     storage.proxyState = "on";
     proxyState = "on";
     buttonPanel.port.emit("changeMenu", "proxyIsOn");

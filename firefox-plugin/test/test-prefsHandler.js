@@ -21,7 +21,8 @@ exports["test save preferences"] = function(assert) {
     email: "em@il.li",
     password: "verifyme",
     proxyaddress: "http://thereisno.spoon:9876",
-    timeout: "100"
+    timeout: "100",
+    profile: "default1"
   };
   handler.save(prefs);
   assert.ok(preferences.prefs["Websocket address"] === "ws://testeme.me:4321");
@@ -29,6 +30,7 @@ exports["test save preferences"] = function(assert) {
   assert.ok(preferences.prefs["Password"] === "verifyme");
   assert.ok(preferences.prefs["Proxy address"] === "http://thereisno.spoon:9876");
   assert.ok(preferences.prefs["Reconnection timeout"] === "100");
+  assert.ok(preferences.prefs["Profile"] === "default1");
 }
 
 require("sdk/test").run(exports);

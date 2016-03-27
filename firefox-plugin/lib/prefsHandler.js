@@ -6,7 +6,8 @@ function fetchPrefs() {
     email: preferences.prefs["E-mail"],
     password: preferences.prefs["Password"],
     proxyaddress: preferences.prefs["Proxy address"],
-    timeout: preferences.prefs["Reconnection timeout"]
+    timeout: preferences.prefs["Reconnection timeout"],
+    profile: preferences.prefs["Profile"]
   };
 }
 
@@ -16,6 +17,7 @@ function savePrefs(prefs) {
   preferences.prefs["Password"] = prefs.password;
   preferences.prefs["Proxy address"] = prefs.proxyaddress;
   preferences.prefs["Reconnection timeout"] = prefs.timeout;
+  preferences.prefs["Profile"] = prefs.profile;
 }
 
 exports.fetch = fetchPrefs;

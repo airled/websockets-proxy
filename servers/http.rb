@@ -6,7 +6,7 @@ set :server, 'thin'
 set :bind, '127.0.0.1'
 set :port, 3103
 
-portlist = Portlist.new
+queuelist = Queuelist.new
 
 def get_request_data(request_env)
   host = request_env['HTTP_HOST']
@@ -34,12 +34,9 @@ route :get, :post, :put, :delete, :head, '/*' do
   if personal_port.nil? || personal_queue.nil?
     status 403
     body 'Invalid request'
-  elsif !portlist.include?(personal_port)
+  elsif !queuelist.has_queue?(personal_queue)
     status 404
-    body 'No websocket for this port'
-  elsif !portlist.queue_for_port?(personal_queue, personal_port)
-    status 403
-    body 'Invalid request data'
+    body 'No websocket'
   else
     data_hash = get_request_data(request.env)
     answer = ''
@@ -49,7 +46,7 @@ route :get, :post, :put, :delete, :head, '/*' do
     channel = connection.create_channel
     exchange = channel.default_exchange
     queue_exclusive = channel.queue('', exclusive: true)
-    routing_key = Account[port: personal_port].queue
+    routing_key = personal_queue
 
     exchange.publish(data_hash.merge(reply_to: queue_exclusive.name).to_json, routing_key: routing_key)
     

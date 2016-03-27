@@ -15,7 +15,7 @@
 			width: 80px;
 		}
 		#profile{
-			width: 110px;
+			width: 100px;
 		}
 		#buttonWrapper{
 			float: right;
@@ -24,33 +24,44 @@
 </head>
 <body>
 	<form action="#">
+
 		<fieldset>
 	        <legend>Email</legend>
 			<input type="email" id="email" name="email" placeholder="Email">
 		</fieldset>
+
 		<fieldset>
 	        <legend>Пароль</legend>
 			<input type="password" id="password" name="password" placeholder="Пароль">
 		</fieldset>
+
 		<fieldset>
 	        <legend>Адрес websocket</legend>
 			<input type="text" id="wsaddress" name="wsaddress" placeholder="Адрес websocket">
 		</fieldset>
+
 		<fieldset>
 	        <legend>Адрес proxy</legend>
 			<input type="text" id="proxyaddress" name="proxyaddress" placeholder="Адрес proxy">
 		</fieldset>
+
 		<fieldset class="inline">
 			<legend>Таймаут</legend>
 			<input type="number" min="10" id="timeout" name="timeout" placeholder="Таймаут"> с
 		</fieldset>
-		<fieldset class="inline" id="profile">
+
+		<fieldset class="inline">
+			<legend>Профиль</legend>
+			<input type="text" id="profile" name="profile" placeholder="Профиль">
+		</fieldset>
+
+		<!-- <fieldset class="inline" id="profile">
 			<legend>Профиль</legend>
 			<select name="profile" id="profile">
-				<option value="Test1">Тест1</option>
-				<option value="Test2">Тест2</option>
+				<option value="Test1">default</option>
 			</select>
-		</fieldset>
+		</fieldset> -->
+
 		<div id="buttonWrapper">
 			<input type="reset" value="Сброс">
 			<button type="button" title="save">Сохранить</button> 

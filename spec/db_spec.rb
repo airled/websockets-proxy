@@ -7,9 +7,9 @@ describe 'Database' do
     expect(get_db).to eq('ws_test')
   end
 
-  it 'should be ws_development if environment is "development"' do
+  it 'should be ws_dev if environment is "development"' do
     ENV['RACK_ENV'] = 'development'
-    expect(get_db).to eq('ws_development')
+    expect(get_db).to eq('ws_dev')
   end
 
   it 'should be ws_production if environment is "production"' do
