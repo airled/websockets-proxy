@@ -152,13 +152,13 @@ function switchProxyState() {
     proxyPort = parseInt(prefs.proxyaddress.replace("http://", "").split(":")[1], 10);
   }
   if (proxyState !== "on") {
+    authenticator.authenticate(prefs.email, prefs.password, prefs.profile);
     setBadge("p", "#EEEE00");
     storage.proxyState = "on";
     proxyState = "on";
     buttonPanel.port.emit("changeMenu", "proxyIsOn");
     config.store();
     config.set(proxyIp, proxyPort);
-    authenticator.authenticate(prefs.email, prefs.password, prefs.profile);
   }
   else {
     storage.proxyState = "off";
