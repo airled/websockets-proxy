@@ -136,7 +136,6 @@ function wsSwitch() {
     wsState = "off";
     buttonPanel.port.emit("changeMenu", "wsIsOff");
     pageWorker.destroy();
-    helper.notify("Locally closed");
     setBadge("", "");
   }
 }
@@ -154,12 +153,12 @@ function switchProxyState() {
   }
   if (proxyState !== "on") {
     setBadge("p", "#EEEE00");
-    authenticator.authenticate(prefs.email, prefs.password, prefs.profile);
     storage.proxyState = "on";
     proxyState = "on";
     buttonPanel.port.emit("changeMenu", "proxyIsOn");
     config.store();
     config.set(proxyIp, proxyPort);
+    authenticator.authenticate(prefs.email, prefs.password, prefs.profile);
   }
   else {
     storage.proxyState = "off";
@@ -212,3 +211,4 @@ buttonPanel.port.on("pluginMenuClick", function(title) {
 
 exports.setBadge = setBadge;
 exports.setQueueHeaderState = setQueueHeaderState;
+exports.switchProxyState = switchProxyState;

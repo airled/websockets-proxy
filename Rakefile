@@ -43,7 +43,7 @@ task :prod do
 end
 
 task :dp do
-  system 'scp firefox-plugin/@bproxy-0.2.0.xpi wsweb@51.254.10.211:/home/wsweb/current/public/'
+  system 'scp firefox-plugin/@bproxy-0.3.0.xpi wsweb@51.254.10.211:/home/wsweb/current/public/'
 end
 
 task :test do

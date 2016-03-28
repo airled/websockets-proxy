@@ -10,8 +10,7 @@ class Account < Sequel::Model
   end
 
   def has_profile?(profile_name)
-    profile = Profile[account_id: self.id, name: profile_name]
-    !profile.nil?
+    !!(Profile[account_id: self.id, name: profile_name])
   end
   
 end

@@ -15,19 +15,19 @@ function authenticate(email, password, profile) {
     anonymous: true,
     onComplete: function(response) {
       if (response.json == null){
-        helper.notify('failed connect to server');
-        main.setBadge('p', '#EE0000');
+        helper.notify("Failed connect to server");
+        main.switchProxyState();
       }
       else if (response.json.result === "ok") {
-        helper.notify('http authentication ok');
+        helper.notify("Proxy is on");
         storage.queue = response.json.queue;
         observer.register();
-        main.setBadge('p', '#0000EE');
+        main.setBadge("p", "#0000EE");
         helper.notify(response.json.queue);
       }
       else if (response.json.result === "failed") {
-        helper.notify('http authentication failed');
-        main.setBadge('p', '#EE0000');
+        helper.notify("Some prefs are not correct");
+        main.switchProxyState();
       }
     }
   });
