@@ -24,13 +24,24 @@ def authenticate(init_message)
   end
 end
 
+def generate_uniq_queue
+  require 'securerandom'
+  queue = ''
+    loop do
+      current_queue = SecureRandom.hex
+      if Profile[queue: current_queue].nil?
+        queue = current_queue
+        break
+      end
+    end
+  queue
+end
+
 get '/' do
   request.websocket do |ws|
     authenticated = false
     account = nil
     profile = nil
-    profile_queue = nil
-    activated = false
 
     ws.onopen do
       puts 'Websocket opened'
@@ -46,26 +57,18 @@ get '/' do
       if !authenticated
         init_message = JSON.parse(response)
         if valid?(init_message) && account = authenticate(init_message)
-          if account.has_profile?(init_message['profile'])
-            profile = Profile[account_id: account.id, name: init_message['profile']]
+          if !account.has_profile?(init_message['profile'])
+            profile = account.add_profile(name: init_message['profile'], queue: generate_uniq_queue)
             profile_queue = profile.queue
-            if !queuelist.has_queue?(profile_queue)
-              ws.send('auth_ok')
-              p "Queue \'#{profile_queue}\' for profile \'#{profile.name}\' of user \'#{account.email}\'"
-              authenticated = true
-              queuelist.set(profile_queue)
-              activated = true
-              profile.activate
-              queue = channel.queue(profile_queue)
-              queue.subscribe do |delivery_info, metadata, payload|
-                ws.send(payload)
-              end
-            else
-              ws.send('busy_profile')
-              ws.close_websocket
+            ws.send('auth_ok')
+            p "Queue \'#{profile_queue}\' for profile \'#{profile.name}\' of user \'#{account.email}\'"
+            authenticated = true
+            queue = channel.queue(profile_queue)
+            queue.subscribe do |delivery_info, metadata, payload|
+              ws.send(payload)
             end
           else
-            ws.send('wrong_profile')
+            ws.send('profile is busy')
             ws.close_websocket
           end
         else
@@ -79,9 +82,9 @@ get '/' do
     end
 
     ws.onclose do
+      profile.destroy if profile
       puts 'Websocket closed'
       connection.close
-      queuelist.unset(profile_queue) && profile.deactivate if activated == true
     end
 
   end #websocket

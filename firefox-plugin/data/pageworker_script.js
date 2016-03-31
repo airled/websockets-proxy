@@ -46,11 +46,7 @@ self.port.on('init', function(init_params) {
       self.port.emit('notificate', 'Authentication failed');
       self.port.emit('shutdown', '');
     }
-    else if (request.data === 'wrong_profile') {
-      self.port.emit('notificate', 'No such profile');
-      self.port.emit('shutdown', '');
-    }
-    else if (request.data === 'busy_profile') {
+    else if (request.data === 'profile is busy') {
       self.port.emit('notificate', 'This profile is already active');
       self.port.emit('shutdown', '');
     }
