@@ -16,4 +16,8 @@ class Profile < Sequel::Model
     self.active == true
   end
 
+  def exists?(profile)
+    !!Profile[name: profile]
+  end
+
 end
