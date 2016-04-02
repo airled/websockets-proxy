@@ -1,4 +1,5 @@
-var helper = require("./helper.js");
+var main = require("../index.js"),
+    helper = require("./helper.js");
 
 function get_profiles(email, password) {
   var request = require("sdk/request").Request({
@@ -17,8 +18,8 @@ function get_profiles(email, password) {
         helper.notify("Some prefs are not correct");
       }
       else if (response.json.result === "ok") {
-        helper.notify("Got profiles");
-        // helper.notify(response.json.profiles);
+        helper.notify("Profiles got");
+        main.setProxyProfilesInPrefsPanel(response.json.profiles);
       }
     }
   });

@@ -49,6 +49,12 @@
       "title": "Profile",
       "type": "string",
       "value": "default"
+    },
+    {
+      "name": "Proxy profile",
+      "title": "Proxy profile",
+      "type": "string",
+      "value": ""
     }
   ]
 }

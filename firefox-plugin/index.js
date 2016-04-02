@@ -43,7 +43,7 @@ else {
 
 var prefsPanel = panels.Panel({
   width: 280,
-  height: 340,
+  height: 500,
   contentURL: "./prefs_panel/prefs_panel.html",
   contentScriptFile: "./prefs_panel/prefs_panel.js"
 });
@@ -144,38 +144,37 @@ function wsSwitch() {
 function switchProxyState() {
 
   let prefs = preferences.fetch();
-  if (prefs.email === '' || prefs.password === '' || prefs.proxyaddress === "") {
+  if (prefs.email === '' || prefs.password === '' || prefs.proxyaddress === "" || prefs.proxyProfile === "") {
     helper.notify("Some prefs fields are empty");
     return;    
   }
-  // else {
-  //   proxyIp = prefs.proxyaddress.replace("http://", "").split(":")[0];
-  //   proxyPort = parseInt(prefs.proxyaddress.replace("http://", "").split(":")[1], 10);
-  // }
+  else {
+    proxyIp = prefs.proxyaddress.replace("http://", "").split(":")[0];
+    proxyPort = parseInt(prefs.proxyaddress.replace("http://", "").split(":")[1], 10);
+  }
   if (proxyState !== "on") {
-    // authenticator.authenticate(prefs.email, prefs.password, prefs.profile);
-    // setBadge("p", "#EEEE00");
-    // storage.proxyState = "on";
-    // proxyState = "on";
+    authenticator.authenticate(prefs.email, prefs.password, prefs.proxyProfile);
+    setBadge("p", "#EEEE00");
+    storage.proxyState = "on";
+    proxyState = "on";
     buttonPanel.port.emit("changeMenu", "proxyIsOn");
-    profilesGetter.get(prefs.email, prefs.password);
-    // config.store();
-    // config.set(proxyIp, proxyPort);
+    config.store();
+    config.set(proxyIp, proxyPort);
   }
   else {
-    // storage.proxyState = "off";
-    // proxyState = "off";
-    // if (queueHeaderState === "on") {
-    //   observer.unregister();
-    // }
+    storage.proxyState = "off";
+    proxyState = "off";
+    if (queueHeaderState === "on") {
+      observer.unregister();
+    }
     buttonPanel.port.emit("changeMenu", "proxyIsOff");
-    // setBadge("", "");
-    // if (typeof storage.old == "undefined" || helper.checkEmpty(storage.old)) {
-    //   config.reset();
-    // }
-    // else {
-    //   config.restore();
-    // }
+    setBadge("", "");
+    if (typeof storage.old == "undefined" || helper.checkEmpty(storage.old)) {
+      config.reset();
+    }
+    else {
+      config.restore();
+    }
   }
 }
 
@@ -188,12 +187,20 @@ function setQueueHeaderState(value) {
   queueHeaderState = value;
 }
 
+function setProxyProfilesInPrefsPanel(proxyProfiles) {
+  prefsPanel.port.emit("setProfiles", proxyProfiles);
+}
+
 prefsPanel.port.on("close", function(msg) {
   prefsPanel.hide();
 });
 
 prefsPanel.port.on("saveprefs", function(prefs) {
   preferences.save(prefs);
+});
+
+prefsPanel.port.on("getProfiles", function(msg) {
+  profilesGetter.get(preferences.fetch().email, preferences.fetch().password);
 });
 
 buttonPanel.port.on("pluginMenuClick", function(title) {
@@ -214,3 +221,4 @@ buttonPanel.port.on("pluginMenuClick", function(title) {
 exports.setBadge = setBadge;
 exports.setQueueHeaderState = setQueueHeaderState;
 exports.switchProxyState = switchProxyState;
+exports.setProxyProfilesInPrefsPanel = setProxyProfilesInPrefsPanel;
