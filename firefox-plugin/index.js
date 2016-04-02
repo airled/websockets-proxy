@@ -5,7 +5,8 @@ var helper = require("./lib/helper.js"),
     config = require("./lib/configHandler.js"),
     preferences = require("./lib/prefsHandler.js"),
     observer = require("./lib/httpObserver.js"),
-    authenticator = require("./lib/httpAuthenticator.js");
+    authenticator = require("./lib/httpAuthenticator.js"),
+    profilesGetter = require("./lib/profilesGetter.js");
 
 var wsState = "off";
 var proxyState = storage.proxyState;
@@ -143,37 +144,38 @@ function wsSwitch() {
 function switchProxyState() {
 
   let prefs = preferences.fetch();
-  if (prefs.email === '' || prefs.password === '' || prefs.proxyaddress === "" || prefs.profile === "") {
+  if (prefs.email === '' || prefs.password === '' || prefs.proxyaddress === "") {
     helper.notify("Some prefs fields are empty");
     return;    
   }
-  else {
-    proxyIp = prefs.proxyaddress.replace("http://", "").split(":")[0];
-    proxyPort = parseInt(prefs.proxyaddress.replace("http://", "").split(":")[1], 10);
-  }
+  // else {
+  //   proxyIp = prefs.proxyaddress.replace("http://", "").split(":")[0];
+  //   proxyPort = parseInt(prefs.proxyaddress.replace("http://", "").split(":")[1], 10);
+  // }
   if (proxyState !== "on") {
-    authenticator.authenticate(prefs.email, prefs.password, prefs.profile);
-    setBadge("p", "#EEEE00");
-    storage.proxyState = "on";
-    proxyState = "on";
+    // authenticator.authenticate(prefs.email, prefs.password, prefs.profile);
+    // setBadge("p", "#EEEE00");
+    // storage.proxyState = "on";
+    // proxyState = "on";
     buttonPanel.port.emit("changeMenu", "proxyIsOn");
-    config.store();
-    config.set(proxyIp, proxyPort);
+    profilesGetter.get(prefs.email, prefs.password);
+    // config.store();
+    // config.set(proxyIp, proxyPort);
   }
   else {
-    storage.proxyState = "off";
-    proxyState = "off";
-    if (queueHeaderState === "on") {
-      observer.unregister();
-    }
+    // storage.proxyState = "off";
+    // proxyState = "off";
+    // if (queueHeaderState === "on") {
+    //   observer.unregister();
+    // }
     buttonPanel.port.emit("changeMenu", "proxyIsOff");
-    setBadge("", "");
-    if (typeof storage.old == "undefined" || helper.checkEmpty(storage.old)) {
-      config.reset();
-    }
-    else {
-      config.restore();
-    }
+    // setBadge("", "");
+    // if (typeof storage.old == "undefined" || helper.checkEmpty(storage.old)) {
+    //   config.reset();
+    // }
+    // else {
+    //   config.restore();
+    // }
   }
 }
 
