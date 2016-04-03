@@ -31,7 +31,7 @@ self.port.on("setProfiles", function(profiles) {
 window.addEventListener("click", function(event) {
   switch (event.target.getAttribute("title")) {
     case "getProfiles":
-      self.port.emit("getProfiles", "");
+      self.port.emit("getProfiles", {email: email.value, password: password.value});
       break;
     case "close":
       self.port.emit("close", "");

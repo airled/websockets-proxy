@@ -4,10 +4,6 @@
 	<title></title>
 	<meta charset="utf-8">
 	<style>
-		#wrapper{
-			width: 100%;
-			text-align: right;
-		}
 		.inline{
 			display: inline-block;
 		}
@@ -15,10 +11,14 @@
 			width: 80px;
 		}
 		#profile{
-			width: 100px;
+			width: 102px;
 		}
-		#buttonWrapper{
+		#buttonWrapper * {
 			float: right;
+			margin-right: 3px;
+		}
+		#proxyProfiles {
+			width: 143px;
 		}
 	</style>
 </head>
@@ -40,11 +40,6 @@
 			<input type="text" id="wsaddress" name="wsaddress" placeholder="Адрес websocket">
 		</fieldset>
 
-		<fieldset>
-	        <legend>Адрес proxy</legend>
-			<input type="text" id="proxyaddress" name="proxyaddress" placeholder="Адрес proxy">
-		</fieldset>
-
 		<fieldset class="inline">
 			<legend>Таймаут</legend>
 			<input type="number" min="10" id="timeout" name="timeout" placeholder="Таймаут"> с
@@ -56,16 +51,21 @@
 		</fieldset>
 
 		<fieldset>
+	        <legend>Адрес proxy</legend>
+			<input type="text" id="proxyaddress" name="proxyaddress" placeholder="Адрес proxy">
+		</fieldset>
+
+		<fieldset class="inline">
 			<legend>Профили proxy</legend>
+			<button type="button" title="getProfiles">Получить</button> 
 			<select name="proxyProfiles" id="proxyProfiles">
 			</select>
 		</fieldset>
-		<button type="button" title="getProfiles">Получить профили</button> 
 
 		<div id="buttonWrapper">
-			<input type="reset" value="Сброс">
-			<button type="button" title="save">Сохранить</button> 
 			<button type="button" title="close">Закрыть</button> 
+			<button type="button" title="save">Сохранить</button> 
+			<input type="reset" value="Сброс">
 		</div>
 	</form>
 </body>

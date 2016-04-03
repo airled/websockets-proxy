@@ -43,7 +43,7 @@ else {
 
 var prefsPanel = panels.Panel({
   width: 280,
-  height: 500,
+  height: 400,
   contentURL: "./prefs_panel/prefs_panel.html",
   contentScriptFile: "./prefs_panel/prefs_panel.js"
 });
@@ -199,8 +199,8 @@ prefsPanel.port.on("saveprefs", function(prefs) {
   preferences.save(prefs);
 });
 
-prefsPanel.port.on("getProfiles", function(msg) {
-  profilesGetter.get(preferences.fetch().email, preferences.fetch().password);
+prefsPanel.port.on("getProfiles", function(email_and_password) {
+  profilesGetter.get(email_and_password.email, email_and_password.password);
 });
 
 buttonPanel.port.on("pluginMenuClick", function(title) {
