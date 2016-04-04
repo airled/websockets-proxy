@@ -31,12 +31,14 @@ route :get, :post, :put, :delete, :head, '/*' do
   # personal_queue = '20bb1dded7add8a6fb'
   personal_port = request.env['HTTP_PERSONALPORT']
   personal_queue = request.env['HTTP_PERSONALQUEUE']
-  if personal_port.nil? || personal_queue.nil?
+  account = Account[port: personal_port]
+
+  if personal_port.nil? || personal_queue.nil? || account.nil?
     status 403
     body 'Invalid request'
-  elsif !queuelist.has_queue?(personal_queue)
+  elsif !account.has_profile_with_queue?(personal_queue)
     status 404
-    body 'No websocket'
+    body 'No profile'
   else
     data_hash = get_request_data(request.env)
     answer = ''
