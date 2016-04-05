@@ -16,6 +16,7 @@ group :development, :test do
   gem 'rspec'
   gem 'mina'
   gem 'curb'
+  gem 'database_cleaner'
 end
 
 gem "codeclimate-test-reporter", group: :test, require: nil

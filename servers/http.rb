@@ -27,9 +27,9 @@ def get_request_data(request_env)
 end
 
 route :get, :post, :put, :delete, :head, '/*' do
-  # personal_port = '3102'
+  personal_port = '3456'
   # personal_queue = '20bb1dded7add8a6fb'
-  personal_port = request.env['HTTP_PERSONALPORT']
+  # personal_port = request.env['HTTP_PERSONALPORT']
   personal_queue = request.env['HTTP_PERSONALQUEUE']
   account = Account[port: personal_port]
 

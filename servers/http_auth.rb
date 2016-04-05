@@ -1,6 +1,5 @@
 require 'sinatra'
-require 'json'
-require_relative '../config/models'
+require_relative '../config/initializer'
 
 set :server, 'thin'
 set :bind, '127.0.0.1'
