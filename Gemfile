@@ -10,6 +10,7 @@ gem 'sequel'
 gem 'mysql2'
 gem 'bcrypt'
 gem 'redis'
+gem 'redis-namespace'
 
 group :development, :test do
   gem 'pry'

@@ -2,10 +2,8 @@ require 'redis'
 
 class Queuelist
 
-  DEFAULT_DATABASE = '15'
-
-  def initialize(db_number=DEFAULT_DATABASE)
-    @list = Redis.new(db: db_number)
+  def initialize
+    @list = Redis::Namespace.new(:queuelist, redis: Redis.new)
   end
 
   def set(queue)
